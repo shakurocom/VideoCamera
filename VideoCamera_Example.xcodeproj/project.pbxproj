@@ -101,19 +101,35 @@
 			isa = PBXGroup;
 			children = (
 				17AC9F4028AA764100DF8A2B /* AppDelegate.swift */,
-				17AC9F6F28AA796A00DF8A2B /* Example.swift */,
-				17AC9F7128AA798400DF8A2B /* ExampleViewControllerProtocol.swift */,
-				17AC9F7328AA798F00DF8A2B /* ExampleSelectorViewController.swift */,
-				17AC9F7528AA79A200DF8A2B /* ExampleImageProcessorViewController.swift */,
-				17AC9F7728AA79AC00DF8A2B /* ExampleVideoCameraViewController.swift */,
-				17AC9F7C28AA7D1900DF8A2B /* ImagePreviewViewController.swift */,
-				17AC9F4628AA764100DF8A2B /* Main.storyboard */,
-				17AC9F4928AA764200DF8A2B /* Assets.xcassets */,
-				17AC9F7928AA79C400DF8A2B /* IMG_0010.JPG */,
-				17AC9F4B28AA764200DF8A2B /* LaunchScreen.storyboard */,
-				17AC9F4E28AA764200DF8A2B /* Info.plist */,
+				6B9CC1A928D85DC800DE744A /* UI */,
+				6B9CC1A828D85DAF00DE744A /* Resources */,
 			);
 			path = VideoCamera_Example;
+			sourceTree = "<group>";
+		};
+		6B9CC1A828D85DAF00DE744A /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				17AC9F7928AA79C400DF8A2B /* IMG_0010.JPG */,
+				17AC9F4E28AA764200DF8A2B /* Info.plist */,
+				17AC9F4928AA764200DF8A2B /* Assets.xcassets */,
+				17AC9F4B28AA764200DF8A2B /* LaunchScreen.storyboard */,
+				17AC9F4628AA764100DF8A2B /* Main.storyboard */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		6B9CC1A928D85DC800DE744A /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				17AC9F6F28AA796A00DF8A2B /* Example.swift */,
+				17AC9F7528AA79A200DF8A2B /* ExampleImageProcessorViewController.swift */,
+				17AC9F7328AA798F00DF8A2B /* ExampleSelectorViewController.swift */,
+				17AC9F7728AA79AC00DF8A2B /* ExampleVideoCameraViewController.swift */,
+				17AC9F7128AA798400DF8A2B /* ExampleViewControllerProtocol.swift */,
+				17AC9F7C28AA7D1900DF8A2B /* ImagePreviewViewController.swift */,
+			);
+			path = UI;
 			sourceTree = "<group>";
 		};
 		A7429B68649458703BCDD98D /* Pods */ = {
@@ -417,7 +433,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = MW2UF479VW;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = VideoCamera_Example/Info.plist;
+				INFOPLIST_FILE = VideoCamera_Example/Resources/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "give me your camera! now!";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -448,7 +464,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = MW2UF479VW;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = VideoCamera_Example/Info.plist;
+				INFOPLIST_FILE = VideoCamera_Example/Resources/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "give me your camera! now!";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;

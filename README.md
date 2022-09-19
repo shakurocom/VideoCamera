@@ -1,4 +1,4 @@
-![Shakuro VideoCamera](title_image.png)
+![Shakuro VideoCamera](Resources/title_image.png)
 <br><br>
 # VideoCamera
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
