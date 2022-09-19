@@ -20,11 +20,9 @@
 		17AC9F6A28AA771F00DF8A2B /* VideoCameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AC9F6128AA771F00DF8A2B /* VideoCameraPreviewView.swift */; };
 		17AC9F6D28AA789C00DF8A2B /* CGSize+Aspect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AC9F6B28AA789C00DF8A2B /* CGSize+Aspect.swift */; };
 		17AC9F6E28AA789C00DF8A2B /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AC9F6C28AA789C00DF8A2B /* ImageProcessor.swift */; };
-		2ECCF0C83CF6B1FC5F47535B /* Pods_VideoCamera_Framework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 423C31C62DCC4AC332C257F1 /* Pods_VideoCamera_Framework.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		04F2042ECADE4CF113CEB469 /* Pods-VideoCamera_Framework.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VideoCamera_Framework.debug.xcconfig"; path = "Target Support Files/Pods-VideoCamera_Framework/Pods-VideoCamera_Framework.debug.xcconfig"; sourceTree = "<group>"; };
 		17AC9F2528AA747D00DF8A2B /* VideoCamera_Framework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = VideoCamera_Framework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		17AC9F2828AA747D00DF8A2B /* VideoCamera_Framework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VideoCamera_Framework.h; sourceTree = "<group>"; };
 		17AC9F2F28AA74A400DF8A2B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -42,8 +40,6 @@
 		17AC9F6128AA771F00DF8A2B /* VideoCameraPreviewView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoCameraPreviewView.swift; sourceTree = "<group>"; };
 		17AC9F6B28AA789C00DF8A2B /* CGSize+Aspect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGSize+Aspect.swift"; sourceTree = "<group>"; };
 		17AC9F6C28AA789C00DF8A2B /* ImageProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageProcessor.swift; sourceTree = "<group>"; };
-		423C31C62DCC4AC332C257F1 /* Pods_VideoCamera_Framework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VideoCamera_Framework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DB37BD44004C714CD468B65E /* Pods-VideoCamera_Framework.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VideoCamera_Framework.release.xcconfig"; path = "Target Support Files/Pods-VideoCamera_Framework/Pods-VideoCamera_Framework.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,7 +47,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2ECCF0C83CF6B1FC5F47535B /* Pods_VideoCamera_Framework.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,7 +63,6 @@
 				17AC9F5828AA771F00DF8A2B /* Source */,
 				17AC9F2628AA747D00DF8A2B /* Products */,
 				B118F73853BBE0259A3C3598 /* Pods */,
-				1F064508A9B3270EA1E6AAC4 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -107,19 +101,9 @@
 			path = Source;
 			sourceTree = "<group>";
 		};
-		1F064508A9B3270EA1E6AAC4 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				423C31C62DCC4AC332C257F1 /* Pods_VideoCamera_Framework.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		B118F73853BBE0259A3C3598 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				04F2042ECADE4CF113CEB469 /* Pods-VideoCamera_Framework.debug.xcconfig */,
-				DB37BD44004C714CD468B65E /* Pods-VideoCamera_Framework.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -142,7 +126,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 17AC9F2C28AA747D00DF8A2B /* Build configuration list for PBXNativeTarget "VideoCamera_Framework" */;
 			buildPhases = (
-				4FDCC092F03AA7624CEA66D6 /* [CP] Check Pods Manifest.lock */,
 				17AC9F2028AA747D00DF8A2B /* Headers */,
 				17AC9F2128AA747D00DF8A2B /* Sources */,
 				17AC9F2228AA747D00DF8A2B /* Frameworks */,
@@ -199,31 +182,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		4FDCC092F03AA7624CEA66D6 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-VideoCamera_Framework-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		17AC9F2128AA747D00DF8A2B /* Sources */ = {
@@ -369,7 +327,6 @@
 		};
 		17AC9F2D28AA747D00DF8A2B /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 04F2042ECADE4CF113CEB469 /* Pods-VideoCamera_Framework.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -399,7 +356,6 @@
 		};
 		17AC9F2E28AA747D00DF8A2B /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DB37BD44004C714CD468B65E /* Pods-VideoCamera_Framework.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
