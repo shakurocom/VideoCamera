@@ -20,6 +20,7 @@
 		17AC9F6A28AA771F00DF8A2B /* VideoCameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AC9F6128AA771F00DF8A2B /* VideoCameraPreviewView.swift */; };
 		17AC9F6D28AA789C00DF8A2B /* CGSize+Aspect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AC9F6B28AA789C00DF8A2B /* CGSize+Aspect.swift */; };
 		17AC9F6E28AA789C00DF8A2B /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AC9F6C28AA789C00DF8A2B /* ImageProcessor.swift */; };
+		6B473CB128E7109D0040D82B /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 6B473CB028E7109C0040D82B /* .swiftlint.yml */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		17AC9F6128AA771F00DF8A2B /* VideoCameraPreviewView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoCameraPreviewView.swift; sourceTree = "<group>"; };
 		17AC9F6B28AA789C00DF8A2B /* CGSize+Aspect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGSize+Aspect.swift"; sourceTree = "<group>"; };
 		17AC9F6C28AA789C00DF8A2B /* ImageProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageProcessor.swift; sourceTree = "<group>"; };
+		6B473CB028E7109C0040D82B /* .swiftlint.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,10 +61,11 @@
 				17AC9F3028AA74FE00DF8A2B /* LICENSE.md */,
 				17AC9F3128AA74FE00DF8A2B /* README.md */,
 				17AC9F3228AA75C300DF8A2B /* Shakuro.VideoCamera.podspec */,
-				17AC9F2728AA747D00DF8A2B /* VideoCamera_Framework */,
+				6B473CB028E7109C0040D82B /* .swiftlint.yml */,
 				17AC9F5828AA771F00DF8A2B /* Source */,
-				17AC9F2628AA747D00DF8A2B /* Products */,
+				17AC9F2728AA747D00DF8A2B /* VideoCamera_Framework */,
 				B118F73853BBE0259A3C3598 /* Pods */,
+				17AC9F2628AA747D00DF8A2B /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -177,6 +180,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6B473CB128E7109D0040D82B /* .swiftlint.yml in Resources */,
 				17AC9F3328AA75C300DF8A2B /* Shakuro.VideoCamera.podspec in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
