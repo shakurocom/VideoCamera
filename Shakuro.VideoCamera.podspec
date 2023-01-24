@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
     s.name             = 'Shakuro.VideoCamera'
-    s.version          = '1.0.0'
+    s.version          = '1.0.1'
     s.summary          = 'VideoCamera'
     s.homepage         = 'https://github.com/shakurocom/VideoCamera'
     s.license          = { :type => "MIT", :file => "LICENSE.md" }
@@ -11,5 +11,5 @@ Pod::Spec.new do |s|
     s.source_files     = 'Source/*'
     s.ios.deployment_target = '11.0'
 
-    s.dependency "Shakuro.CommonTypes", "1.1.4"
+    s.dependency "Shakuro.CommonTypes", "~> 1.1"
 end
