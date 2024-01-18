@@ -19,7 +19,7 @@ public class VideoCameraFactory {
     public static func createCamera(configuration: VideoCameraConfiguration) -> VideoCamera {
         let camera: VideoCamera
         let currentDevice = DeviceType.current
-        if currentDevice == .simulatorI386 || currentDevice == .simulatorX8664 {
+        if currentDevice == .simulatorI386 || currentDevice == .simulatorX8664 || currentDevice == .simulatorARM64 {
             do {
                 camera = try SimulatorCamera(configuration: configuration)
             } catch let error as VideoCameraError {
