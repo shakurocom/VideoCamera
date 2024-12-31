@@ -7,6 +7,7 @@ import AVFoundation
 import Foundation
 import UIKit
 
+@MainActor
 internal class SimulatorCamera {
 
     // general
@@ -60,7 +61,9 @@ internal class SimulatorCamera {
 
         // simulate creation of capture device
         VideoCameraFactory.requestAuthorizationForVideo(completion: { (_: Bool) in
-            self.delegate?.videoCamera(self, authorizationStatusChanged: VideoCameraFactory.authorizationStatusForVideo())
+            DispatchQueue.main.async(execute: { // TODO: implement - called on background
+                self.delegate?.videoCamera(self, authorizationStatusChanged: VideoCameraFactory.authorizationStatusForVideo())
+            })
         })
 
         // done

@@ -21,9 +21,11 @@
 		17AC9F6D28AA789C00DF8A2B /* CGSize+Aspect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AC9F6B28AA789C00DF8A2B /* CGSize+Aspect.swift */; };
 		17AC9F6E28AA789C00DF8A2B /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AC9F6C28AA789C00DF8A2B /* ImageProcessor.swift */; };
 		6B473CB128E7109D0040D82B /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 6B473CB028E7109C0040D82B /* .swiftlint.yml */; };
+		F0F52CE8E9352C65349BF4F2 /* Pods_VideoCamera_Framework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 871BB38F66EB1C030CCB7C41 /* Pods_VideoCamera_Framework.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		15A55577DC20E7D8851EEDFF /* Pods-VideoCamera_Framework.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VideoCamera_Framework.release.xcconfig"; path = "Target Support Files/Pods-VideoCamera_Framework/Pods-VideoCamera_Framework.release.xcconfig"; sourceTree = "<group>"; };
 		17AC9F2528AA747D00DF8A2B /* VideoCamera_Framework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = VideoCamera_Framework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		17AC9F2828AA747D00DF8A2B /* VideoCamera_Framework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VideoCamera_Framework.h; sourceTree = "<group>"; };
 		17AC9F2F28AA74A400DF8A2B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -42,6 +44,8 @@
 		17AC9F6B28AA789C00DF8A2B /* CGSize+Aspect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGSize+Aspect.swift"; sourceTree = "<group>"; };
 		17AC9F6C28AA789C00DF8A2B /* ImageProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageProcessor.swift; sourceTree = "<group>"; };
 		6B473CB028E7109C0040D82B /* .swiftlint.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
+		871BB38F66EB1C030CCB7C41 /* Pods_VideoCamera_Framework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VideoCamera_Framework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B8F246F75AC3F4D07B44EA08 /* Pods-VideoCamera_Framework.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VideoCamera_Framework.debug.xcconfig"; path = "Target Support Files/Pods-VideoCamera_Framework/Pods-VideoCamera_Framework.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,6 +53,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F0F52CE8E9352C65349BF4F2 /* Pods_VideoCamera_Framework.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -66,6 +71,7 @@
 				17AC9F2728AA747D00DF8A2B /* VideoCamera_Framework */,
 				B118F73853BBE0259A3C3598 /* Pods */,
 				17AC9F2628AA747D00DF8A2B /* Products */,
+				D3C5A4B385007182E6F1121D /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -107,8 +113,18 @@
 		B118F73853BBE0259A3C3598 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
+				B8F246F75AC3F4D07B44EA08 /* Pods-VideoCamera_Framework.debug.xcconfig */,
+				15A55577DC20E7D8851EEDFF /* Pods-VideoCamera_Framework.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		D3C5A4B385007182E6F1121D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				871BB38F66EB1C030CCB7C41 /* Pods_VideoCamera_Framework.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -129,6 +145,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 17AC9F2C28AA747D00DF8A2B /* Build configuration list for PBXNativeTarget "VideoCamera_Framework" */;
 			buildPhases = (
+				C66C9C2E98D9341A4F5215B2 /* [CP] Check Pods Manifest.lock */,
 				17AC9F2028AA747D00DF8A2B /* Headers */,
 				17AC9F2128AA747D00DF8A2B /* Sources */,
 				17AC9F2228AA747D00DF8A2B /* Frameworks */,
@@ -186,6 +203,31 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C66C9C2E98D9341A4F5215B2 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-VideoCamera_Framework-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		17AC9F2128AA747D00DF8A2B /* Sources */ = {
@@ -260,7 +302,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -317,7 +358,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -331,6 +371,7 @@
 		};
 		17AC9F2D28AA747D00DF8A2B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B8F246F75AC3F4D07B44EA08 /* Pods-VideoCamera_Framework.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -343,6 +384,7 @@
 				INFOPLIST_FILE = VideoCamera_Framework/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -360,6 +402,7 @@
 		};
 		17AC9F2E28AA747D00DF8A2B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 15A55577DC20E7D8851EEDFF /* Pods-VideoCamera_Framework.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -372,6 +415,7 @@
 				INFOPLIST_FILE = VideoCamera_Framework/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -7,6 +7,7 @@ import AVFoundation
 import UIKit
 import Shakuro_CommonTypes
 
+@MainActor
 internal class DeviceCamera: NSObject {
 
     private enum InitializationStatus {
@@ -275,10 +276,8 @@ extension DeviceCamera: AVCapturePhotoCaptureDelegate {
         // photo is captured, but not processed completely - skipping
     }
 
-    @available(iOS 11.0, *)
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         // photo is captured and processed - ready for consume
-        // this is a callback for ios 11.0+
         workQueue.async(execute: {
             guard self.cameraDeviceInitializationStatus == .initialized,
                 self.isCapturingPhoto,
@@ -290,64 +289,6 @@ extension DeviceCamera: AVCapturePhotoCaptureDelegate {
                 completionBlock(nil, actualError)
             } else {
                 if let imageData = photo.fileDataRepresentation() {
-                    completionBlock(imageData, nil)
-                } else {
-                    completionBlock(nil, VideoCameraError.cantFlattenCapturedPhotoToData)
-                }
-            }
-        })
-    }
-
-    @available(iOS, introduced: 10.0, deprecated: 11.0)
-    func photoOutput(_ output: AVCapturePhotoOutput,
-                     didFinishProcessingPhoto photoSampleBuffer: CMSampleBuffer?,
-                     previewPhoto previewPhotoSampleBuffer: CMSampleBuffer?,
-                     resolvedSettings: AVCaptureResolvedPhotoSettings,
-                     bracketSettings: AVCaptureBracketedStillImageSettings?,
-                     error: Error?) {
-        // callback for iOS v10.0 - 10.9999999
-        workQueue.async(execute: {
-            guard self.cameraDeviceInitializationStatus == .initialized,
-                self.isCapturingPhoto,
-                let completionBlock = self.capturePhotoCompletionBlock
-                else {
-                    return
-            }
-            if let actualError = error {
-                completionBlock(nil, actualError)
-            } else {
-                if let photoBuffer = photoSampleBuffer,
-                    let imageData = AVCapturePhotoOutput.jpegPhotoDataRepresentation(forJPEGSampleBuffer: photoBuffer,
-                                                                                     previewPhotoSampleBuffer: previewPhotoSampleBuffer) {
-                    completionBlock(imageData, nil)
-                } else {
-                    completionBlock(nil, VideoCameraError.cantFlattenCapturedPhotoToData)
-                }
-            }
-        })
-    }
-
-    @available(iOS, introduced: 10.0, deprecated: 11.0)
-    func photoOutput(_ output: AVCapturePhotoOutput,
-                     didFinishProcessingRawPhoto rawSampleBuffer: CMSampleBuffer?,
-                     previewPhoto previewPhotoSampleBuffer: CMSampleBuffer?,
-                     resolvedSettings: AVCaptureResolvedPhotoSettings,
-                     bracketSettings: AVCaptureBracketedStillImageSettings?,
-                     error: Error?) {
-        // callback for iOS v10.0 - 10.9999999
-        workQueue.async(execute: {
-            guard self.cameraDeviceInitializationStatus == .initialized,
-                self.isCapturingPhoto,
-                let completionBlock = self.capturePhotoCompletionBlock
-                else {
-                    return
-            }
-            if let actualError = error {
-                completionBlock(nil, actualError)
-            } else {
-                if let rawBuffer = rawSampleBuffer,
-                    let imageData = AVCapturePhotoOutput.dngPhotoDataRepresentation(forRawSampleBuffer: rawBuffer,
-                                                                                    previewPhotoSampleBuffer: previewPhotoSampleBuffer) {
                     completionBlock(imageData, nil)
                 } else {
                     completionBlock(nil, VideoCameraError.cantFlattenCapturedPhotoToData)

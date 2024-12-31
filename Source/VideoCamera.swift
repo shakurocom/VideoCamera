@@ -58,6 +58,7 @@ public protocol VideoCameraSimulatedVideoDataOutputHandler: AnyObject {
 /**
  Delegate will be called from background thread.
  */
+@MainActor
 public protocol VideoCameraDelegate: AnyObject {
     func videoCamera(_ videoCamera: VideoCamera, error: Error)  // error was encountered
     func videoCameraInitialized(_ videoCamera: VideoCamera, errors: [VideoCameraError])     // initialization finished. Errors returned here are not critical

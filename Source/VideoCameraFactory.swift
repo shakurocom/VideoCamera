@@ -7,6 +7,7 @@ import AVFoundation
 import Foundation
 import Shakuro_CommonTypes
 
+@MainActor
 public class VideoCameraFactory {
 
     private init() {}

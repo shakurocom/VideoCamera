@@ -58,11 +58,7 @@ public struct VideoCameraConfiguration {
      Default value is image in JPEG encoding.
      */
     public var capturePhotoSettings: AVCapturePhotoSettings = {
-        if #available(iOS 11.0, *) {
-            return AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.jpeg])
-        } else {
-            return AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecJPEG])
-        }
+        return AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.jpeg])
     }()
 
     /**
