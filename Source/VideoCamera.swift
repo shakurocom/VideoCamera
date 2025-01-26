@@ -16,6 +16,7 @@ public protocol VideoCamera {
     var isInitialized: Bool { get }
     var cameraAuthrizationStatus: AVAuthorizationStatus { get }
 
+    @MainActor
     var previewView: UIView { get }
 
     var hasFlash: Bool { get } // `false` if camera is not initialized
@@ -40,12 +41,15 @@ public protocol VideoCamera {
 
     func startSession() // if authorization was changed - camera will try to initialize itself before starting session
     func stopSession()
+    @MainActor
     func setVideoPreviewPaused(_ paused: Bool)
 
     func capturePhoto(delegate: AVCapturePhotoCaptureDelegate)  // full-power method
     func capturePhoto(completionBlock: @escaping (_ imageData: Data?, _ error: Error?) -> Void)    // convinience method with easy-to-use completion block
 
+    @MainActor
     var metadataRectOfInterest: CGRect { get set }          // in coordinates of preview view
+    @MainActor
     func transformedMetadataObject(_ metadataObject: AVMetadataObject) -> AVMetadataObject? // transform metadata object into preview layer's coordinates
 
 }
@@ -58,7 +62,6 @@ public protocol VideoCameraSimulatedVideoDataOutputHandler: AnyObject {
 /**
  Delegate will be called from background thread.
  */
-@MainActor
 public protocol VideoCameraDelegate: AnyObject {
     func videoCamera(_ videoCamera: VideoCamera, error: Error)  // error was encountered
     func videoCameraInitialized(_ videoCamera: VideoCamera, errors: [VideoCameraError])     // initialization finished. Errors returned here are not critical

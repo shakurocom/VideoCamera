@@ -138,20 +138,20 @@ class ExampleVideoCameraViewController: UIViewController {
 
 extension ExampleVideoCameraViewController: VideoCameraDelegate {
 
-    func videoCamera(_ videoCamera: VideoCamera, error: Error) {
+    nonisolated func videoCamera(_ videoCamera: VideoCamera, error: Error) {
         DispatchQueue.main.async(execute: {
             self.showErrorAlert(error: error)
         })
     }
 
-    func videoCameraInitialized(_ videoCamera: VideoCamera, errors: [VideoCameraError]) {
+    nonisolated func videoCameraInitialized(_ videoCamera: VideoCamera, errors: [VideoCameraError]) {
         DispatchQueue.main.async(execute: {
             self.updateTorchButton()
             self.updateFlashButton()
         })
     }
 
-    func videoCamera(_ videoCamera: VideoCamera, authorizationStatusChanged newValue: AVAuthorizationStatus) {
+    nonisolated func videoCamera(_ videoCamera: VideoCamera, authorizationStatusChanged newValue: AVAuthorizationStatus) {
         DispatchQueue.main.async(execute: {
             switch newValue {
             case .notDetermined:
@@ -168,35 +168,35 @@ extension ExampleVideoCameraViewController: VideoCameraDelegate {
         })
     }
 
-    func videoCamera(_ videoCamera: VideoCamera, flashModeForPhotoDidChanged newValue: AVCaptureDevice.FlashMode) {
+    nonisolated func videoCamera(_ videoCamera: VideoCamera, flashModeForPhotoDidChanged newValue: AVCaptureDevice.FlashMode) {
         DispatchQueue.main.async(execute: {
             self.updateFlashButton()
         })
     }
 
-    func videoCamera(_ videoCamera: VideoCamera, torchModeDidChanged newValue: AVCaptureDevice.TorchMode) {
+    nonisolated func videoCamera(_ videoCamera: VideoCamera, torchModeDidChanged newValue: AVCaptureDevice.TorchMode) {
         DispatchQueue.main.async(execute: {
             self.updateTorchButton()
         })
     }
 
-    func videoCamera(_ videoCamera: VideoCamera, focusPointOfInterestDidChanged newValue: CGPoint) {
+    nonisolated func videoCamera(_ videoCamera: VideoCamera, focusPointOfInterestDidChanged newValue: CGPoint) {
         // skip
     }
 
-    func videoCameraWillCapturePhoto(_ videoCamera: VideoCamera) {
+    nonisolated func videoCameraWillCapturePhoto(_ videoCamera: VideoCamera) {
         // skip
     }
 
-    func videoCameraDidFinishCapturingPhoto(_ videoCamera: VideoCamera, error: Error?) {
+    nonisolated func videoCameraDidFinishCapturingPhoto(_ videoCamera: VideoCamera, error: Error?) {
         // skip
     }
 
-    func videoCameraDidFinishRecordingLivePhoto(_ videoCamera: VideoCamera, url: URL) {
+    nonisolated func videoCameraDidFinishRecordingLivePhoto(_ videoCamera: VideoCamera, url: URL) {
         // skip
     }
 
-    func videoCameraDidFinishProcessingLivePhoto(_ videoCamera: VideoCamera, url: URL, duration: CMTime, photoDisplayTime: CMTime, error: Error?) {
+    nonisolated func videoCameraDidFinishProcessingLivePhoto(_ videoCamera: VideoCamera, url: URL, duration: CMTime, photoDisplayTime: CMTime, error: Error?) {
         // skip
     }
 

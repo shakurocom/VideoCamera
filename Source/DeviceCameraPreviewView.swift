@@ -38,13 +38,11 @@ internal class DeviceCameraPreviewView: VideoCameraPreviewView {
     // MARK: - Public
 
     internal func setCaptureSession(_ session: AVCaptureSession) {
-        DispatchQueue.main.async(execute: {
-            self.previewLayer.removeFromSuperlayer()
-            self.previewLayer = AVCaptureVideoPreviewLayer(session: session)
-            self.previewLayer.frame = self.bounds
-            self.previewLayer.videoGravity = self.videoGravity
-            self.layer.insertSublayer(self.previewLayer, at: 0)
-        })
+        self.previewLayer.removeFromSuperlayer()
+        self.previewLayer = AVCaptureVideoPreviewLayer(session: session)
+        self.previewLayer.frame = self.bounds
+        self.previewLayer.videoGravity = self.videoGravity
+        self.layer.insertSublayer(self.previewLayer, at: 0)
     }
 
     internal func setVideoPreviewPaused(_ paused: Bool) {

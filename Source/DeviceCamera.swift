@@ -7,8 +7,7 @@ import AVFoundation
 import UIKit
 import Shakuro_CommonTypes
 
-@MainActor
-internal class DeviceCamera: NSObject {
+internal final class DeviceCamera: NSObject, Sendable {
 
     private enum InitializationStatus {
         case notInitialized
@@ -18,7 +17,7 @@ internal class DeviceCamera: NSObject {
     }
 
     // delayed init
-    private var initialConfiguration: VideoCameraConfiguration?
+    private let initialConfiguration: VideoCameraConfiguration?
 
     // general
     private weak var delegate: VideoCameraDelegate?
@@ -34,6 +33,7 @@ internal class DeviceCamera: NSObject {
     private var cameraShouldStartSessionAfterInitialization: Bool = false
 
     // preview
+    @MainActor
     private let cameraPreviewView: DeviceCameraPreviewView
 
     // still images (photos)
@@ -54,6 +54,7 @@ internal class DeviceCamera: NSObject {
 
     // MARK: - Initialization
 
+    @MainActor
     internal init(configuration: VideoCameraConfiguration) {
         initialConfiguration = configuration
         delegate = configuration.cameraDelegate
@@ -130,7 +131,9 @@ internal class DeviceCamera: NSObject {
                 }
         })
         notificationTokens.append(token)
-        cameraPreviewView.setCaptureSession(session)
+        Task(operation: { @MainActor [weak self] in
+            self?.cameraPreviewView.setCaptureSession(session)
+        })
         if session.canAddInput(deviceInput) {
             session.addInput(deviceInput)
 
@@ -201,7 +204,6 @@ internal class DeviceCamera: NSObject {
             cameraDeviceInitializationStatus = .initializationError
             delegate?.videoCamera(self, error: VideoCameraError.cantAttachVideoInput)
         }
-        initialConfiguration = nil
     }
 
     // MARK: - Private
@@ -278,6 +280,7 @@ extension DeviceCamera: AVCapturePhotoCaptureDelegate {
 
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         // photo is captured and processed - ready for consume
+        let imageData = photo.fileDataRepresentation()
         workQueue.async(execute: {
             guard self.cameraDeviceInitializationStatus == .initialized,
                 self.isCapturingPhoto,
@@ -288,8 +291,8 @@ extension DeviceCamera: AVCapturePhotoCaptureDelegate {
             if let actualError = error {
                 completionBlock(nil, actualError)
             } else {
-                if let imageData = photo.fileDataRepresentation() {
-                    completionBlock(imageData, nil)
+                if let imageDataActual = imageData {
+                    completionBlock(imageDataActual, nil)
                 } else {
                     completionBlock(nil, VideoCameraError.cantFlattenCapturedPhotoToData)
                 }
@@ -698,6 +701,7 @@ extension DeviceCamera: VideoCamera {
         })
     }
 
+    @MainActor
     func setVideoPreviewPaused(_ paused: Bool) {
         self.cameraPreviewView.setVideoPreviewPaused(paused)
     }
@@ -710,6 +714,7 @@ extension DeviceCamera: VideoCamera {
         internalCapturePhoto(delegate: nil, completionBlock: completionBlock)
     }
 
+    @MainActor
     var metadataRectOfInterest: CGRect {
         get {
             if self.cameraDeviceInitializationStatus == .initialized, let output = metadataOutput {
@@ -721,9 +726,9 @@ extension DeviceCamera: VideoCamera {
         set {
             workQueue.async(execute: {
                 guard self.cameraDeviceInitializationStatus == .initialized,
-                    let output = self.metadataOutput
-                    else {
-                        return
+                      let output = self.metadataOutput
+                else {
+                    return
                 }
                 DispatchQueue.main.async(execute: {
                     let rect = self.cameraPreviewView.metadataOutputRectConverted(fromLayerRect: newValue)
@@ -733,6 +738,7 @@ extension DeviceCamera: VideoCamera {
         }
     }
 
+    @MainActor
     func transformedMetadataObject(_ metadataObject: AVMetadataObject) -> AVMetadataObject? {
         return cameraPreviewView.transformedMetadataObject(metadataObject)
     }
@@ -770,7 +776,8 @@ extension DeviceCamera {
         }
     }
 
-    private func internalCapturePhoto(delegate: AVCapturePhotoCaptureDelegate?, completionBlock: ((_ imageData: Data?, _ error: Error?) -> Void)?) {
+    private func internalCapturePhoto(delegate: AVCapturePhotoCaptureDelegate?,
+                                      completionBlock: (@Sendable (_ imageData: Data?, _ error: Error?) -> Void)?) {
         workQueue.async(execute: {
             guard self.cameraDeviceInitializationStatus == .initialized,
                 !self.isCapturingPhoto,
@@ -791,6 +798,7 @@ extension DeviceCamera {
         })
     }
 
+    @MainActor
     private func orientationFromDevice() -> AVCaptureVideoOrientation {
         let orientation: UIDeviceOrientation
         if useDeviceOrientationListener, let listener = deviceOrientationListener {

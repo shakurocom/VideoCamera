@@ -7,7 +7,6 @@ import AVFoundation
 import Foundation
 import UIKit
 
-@MainActor
 internal class SimulatorCamera {
 
     // general
