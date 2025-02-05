@@ -7,6 +7,7 @@ import AVFoundation
 import Foundation
 import UIKit
 
+@MainActor
 internal class DeviceCameraPreviewView: VideoCameraPreviewView {
 
     private var previewLayer: AVCaptureVideoPreviewLayer

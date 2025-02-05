@@ -210,7 +210,7 @@ extension SimulatorCamera: VideoCamera {
         }
     }
 
-    func capturePhoto(completionBlock: @escaping (Data?, Error?) -> Void) {
+    func capturePhoto(completionBlock: @escaping @Sendable (Data?, Error?) -> Void) {
         let image = UIImage(cgImage: simulatedImage)
         if let imageData = image.jpegData(compressionQuality: 1) {
             completionBlock(imageData, nil)

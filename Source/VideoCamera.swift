@@ -45,7 +45,8 @@ public protocol VideoCamera {
     func setVideoPreviewPaused(_ paused: Bool)
 
     func capturePhoto(delegate: AVCapturePhotoCaptureDelegate)  // full-power method
-    func capturePhoto(completionBlock: @escaping (_ imageData: Data?, _ error: Error?) -> Void)    // convinience method with easy-to-use completion block
+    // convinience method with easy-to-use completion block
+    func capturePhoto(completionBlock: @escaping @Sendable (_ imageData: Data?, _ error: Error?) -> Void)
 
     @MainActor
     var metadataRectOfInterest: CGRect { get set }          // in coordinates of preview view

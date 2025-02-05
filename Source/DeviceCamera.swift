@@ -135,7 +135,9 @@ internal final class DeviceCamera: NSObject, Sendable {
         })
         notificationTokens.append(token)
         Task(operation: { @MainActor [weak self] in
-            self?.cameraPreviewView.setCaptureSession(session)
+            if let session = self?.captureSession {
+                self?.cameraPreviewView.setCaptureSession(session)
+            }
         })
         if session.canAddInput(deviceInput) {
             session.addInput(deviceInput)
@@ -674,7 +676,7 @@ extension DeviceCamera: VideoCamera {
 
             case .initialized:
                 if let session = self.captureSession, !session.isRunning {
-                    DispatchQueue.main.async(execute: {
+                    Task(operation: { @MainActor in
                         session.startRunning()
                     })
                 }
@@ -692,7 +694,7 @@ extension DeviceCamera: VideoCamera {
 
             case .initialized:
                 if let session = self.captureSession, session.isRunning {
-                    DispatchQueue.main.async(execute: {
+                    Task(operation: { @MainActor in
                         session.stopRunning()
                     })
                 }
@@ -713,7 +715,7 @@ extension DeviceCamera: VideoCamera {
         internalCapturePhoto(delegate: delegate, completionBlock: nil)
     }
 
-    func capturePhoto(completionBlock: @escaping (_ imageData: Data?, _ error: Error?) -> Void) {
+    func capturePhoto(completionBlock: @escaping @Sendable (_ imageData: Data?, _ error: Error?) -> Void) {
         internalCapturePhoto(delegate: nil, completionBlock: completionBlock)
     }
 
@@ -733,9 +735,10 @@ extension DeviceCamera: VideoCamera {
                 else {
                     return
                 }
-                DispatchQueue.main.async(execute: {
-                    let rect = self.cameraPreviewView.metadataOutputRectConverted(fromLayerRect: newValue)
-                    output.rectOfInterest = rect
+                Task(operation: { @MainActor [weak self] in
+                    if let rect = self?.cameraPreviewView.metadataOutputRectConverted(fromLayerRect: newValue) {
+                        output.rectOfInterest = rect
+                    }
                 })
             })
         }
