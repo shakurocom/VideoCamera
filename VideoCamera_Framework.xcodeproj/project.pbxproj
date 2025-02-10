@@ -95,17 +95,17 @@
 		17AC9F5828AA771F00DF8A2B /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				17AC9F6B28AA789C00DF8A2B /* CGSize+Aspect.swift */,
-				17AC9F6C28AA789C00DF8A2B /* ImageProcessor.swift */,
-				17AC9F5928AA771F00DF8A2B /* VideoCameraError.swift */,
 				17AC9F5A28AA771F00DF8A2B /* VideoCameraFactory.swift */,
-				17AC9F5B28AA771F00DF8A2B /* DeviceCamera.swift */,
-				17AC9F5C28AA771F00DF8A2B /* VideoCameraConfiguration.swift */,
-				17AC9F5D28AA771F00DF8A2B /* SimulatorCamera.swift */,
 				17AC9F5E28AA771F00DF8A2B /* VideoCamera.swift */,
+				17AC9F5B28AA771F00DF8A2B /* DeviceCamera.swift */,
+				17AC9F5D28AA771F00DF8A2B /* SimulatorCamera.swift */,
+				17AC9F5C28AA771F00DF8A2B /* VideoCameraConfiguration.swift */,
+				17AC9F5928AA771F00DF8A2B /* VideoCameraError.swift */,
+				17AC9F6128AA771F00DF8A2B /* VideoCameraPreviewView.swift */,
 				17AC9F5F28AA771F00DF8A2B /* DeviceCameraPreviewView.swift */,
 				17AC9F6028AA771F00DF8A2B /* SimulatorCameraPreviewView.swift */,
-				17AC9F6128AA771F00DF8A2B /* VideoCameraPreviewView.swift */,
+				17AC9F6C28AA789C00DF8A2B /* ImageProcessor.swift */,
+				17AC9F6B28AA789C00DF8A2B /* CGSize+Aspect.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";

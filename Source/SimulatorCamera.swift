@@ -26,10 +26,12 @@ internal class SimulatorCamera {
     private weak var videoFeedbackHandler: VideoCameraSimulatedVideoDataOutputHandler?
 
     // preview
+    @MainActor
     private let cameraPreviewView: SimulatorCameraPreviewView
 
     // MARK: - Initialization
 
+    @MainActor
     internal init(configuration: VideoCameraConfiguration) throws {
         workQueue = DispatchQueue(label: "com.shakuro.simulatorcamera.workqueue")
         delegate = configuration.cameraDelegate
@@ -167,7 +169,9 @@ extension SimulatorCamera: VideoCamera {
     }
 
     func startSession() {
-        cameraPreviewView.setImageHidden(false)
+        Task(operation: { @MainActor [weak self] in
+            self?.cameraPreviewView.setImageHidden(false)
+        })
         if let bufferHandler = videoFeedbackHandler {
             // create simulated buffer, if it is not created yet
             if videoFeedbackPixelBuffer == nil {
@@ -195,7 +199,9 @@ extension SimulatorCamera: VideoCamera {
     func stopSession() {
         videoFeedbackTimer?.cancel()
         videoFeedbackTimer = nil
-        cameraPreviewView.setImageHidden(true)
+        Task(operation: { @MainActor [weak self] in
+            self?.cameraPreviewView.setImageHidden(true)
+        })
     }
 
     func setVideoPreviewPaused(_ paused: Bool) {

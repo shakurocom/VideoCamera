@@ -85,6 +85,44 @@ internal final class DeviceCamera: NSObject, Sendable {
         }
     }
 
+    // MARK: - Private
+
+    private func authorizedSetup() {
+        guard (cameraDeviceInitializationStatus == .notInitialized) || (cameraDeviceInitializationStatus == .waitingForAuthorization) else {
+            return
+        }
+
+        let status = VideoCameraFactory.authorizationStatusForVideo()
+        videoAuthorizationStatusChanged(to: status)
+        switch status {
+        case .notDetermined:
+            VideoCameraFactory.requestAuthorizationForVideo(completion: { (authGranted: Bool) in
+                self.workQueue.async(execute: {
+                    if authGranted {
+                        self.videoAuthorizationStatusChanged(to: .authorized)
+                        self.setupCaptureSession(configuration: self.initialConfiguration)
+                    } else {
+                        self.videoAuthorizationStatusChanged(to: .denied)
+                        // do nothing - we will try to check authorization on 'startSession'
+                    }
+                })
+            })
+
+        case .restricted,
+             .denied:
+            // do nothing - access is not granted - camera will be not initialized
+            break
+
+        case .authorized:
+            workQueue.async(execute: {
+                self.setupCaptureSession(configuration: self.initialConfiguration)
+            })
+
+        @unknown default:
+            break // like 'denied'
+        }
+    }
+
     private func setupCaptureSession(configuration aConfiguration: VideoCameraConfiguration?) {
         guard let configuration = aConfiguration,
             configuration.cameraPosition != .unspecified else {
@@ -208,44 +246,6 @@ internal final class DeviceCamera: NSObject, Sendable {
         } else {
             cameraDeviceInitializationStatus = .initializationError
             delegate?.videoCamera(self, error: VideoCameraError.cantAttachVideoInput)
-        }
-    }
-
-    // MARK: - Private
-
-    private func authorizedSetup() {
-        guard (cameraDeviceInitializationStatus == .notInitialized) || (cameraDeviceInitializationStatus == .waitingForAuthorization) else {
-            return
-        }
-
-        let status = VideoCameraFactory.authorizationStatusForVideo()
-        videoAuthorizationStatusChanged(to: status)
-        switch status {
-        case .notDetermined:
-            VideoCameraFactory.requestAuthorizationForVideo(completion: { (authGranted: Bool) in
-                self.workQueue.async(execute: {
-                    if authGranted {
-                        self.videoAuthorizationStatusChanged(to: .authorized)
-                        self.setupCaptureSession(configuration: self.initialConfiguration)
-                    } else {
-                        self.videoAuthorizationStatusChanged(to: .denied)
-                        // do nothing - we will try to check authorization on 'startSession'
-                    }
-                })
-            })
-
-        case .restricted,
-             .denied:
-            // do nothing - access is not granted - camera will be not initialized
-            break
-
-        case .authorized:
-            workQueue.async(execute: {
-                self.setupCaptureSession(configuration: self.initialConfiguration)
-            })
-
-        @unknown default:
-            break // like 'denied'
         }
     }
 
