@@ -12,4 +12,6 @@ Pod::Spec.new do |s|
     s.ios.deployment_target = '15.0'
 
     s.dependency "Shakuro.CommonTypes", "~> 1.9.5"
+    s.dependency "Shakuro.BroadcastAsyncStream", "~> 1.0.2"
+
 end
