@@ -1,20 +1,24 @@
 PODS:
+  - Shakuro.BroadcastAsyncStream (1.0.2)
   - Shakuro.CommonTypes (1.9.5)
   - SwiftLint (0.57.1)
 
 DEPENDENCIES:
+  - Shakuro.BroadcastAsyncStream (= 1.0.2)
   - Shakuro.CommonTypes (= 1.9.5)
   - SwiftLint (= 0.57.1)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
+    - Shakuro.BroadcastAsyncStream
     - Shakuro.CommonTypes
     - SwiftLint
 
 SPEC CHECKSUMS:
+  Shakuro.BroadcastAsyncStream: 407906fe1241318fedc35045bb92e2d3919be171
   Shakuro.CommonTypes: 68e5a32e3f2ec4c6c4513aa2a211427b5472b785
   SwiftLint: 92196976e597b9afec5dbe374810103e6c1d9d7c
 
-PODFILE CHECKSUM: b7cf6fb01852c58cbefb48464caa62f4c7b237d3
+PODFILE CHECKSUM: 75c9d9a07defedc7325567d434735210dee3d54f
 
 COCOAPODS: 1.16.2

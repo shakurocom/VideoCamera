@@ -11,7 +11,7 @@ import Shakuro_CommonTypes
 // TODO: implement - migrate to actors when up to iOS 17:
 // https://developer.apple.com/documentation/avfoundation/avcam-building-a-camera-app
 
-internal final class DeviceCamera: NSObject, Sendable {
+internal final class DeviceCamera: NSObject, @unchecked Sendable {
 
     private enum InitializationStatus {
         case notInitialized

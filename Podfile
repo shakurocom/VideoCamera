@@ -9,12 +9,14 @@ workspace 'VideoCamera'
 target 'VideoCamera_Framework' do
     project 'VideoCamera_Framework.xcodeproj'
     pod 'Shakuro.CommonTypes', '1.9.5'
+    pod 'Shakuro.BroadcastAsyncStream', '1.0.2'
 end
 
 target 'VideoCamera_Example' do
     project 'VideoCamera_Example.xcodeproj'
     pod 'Shakuro.CommonTypes', '1.9.5'
     pod 'SwiftLint', '0.57.1'
+    pod 'Shakuro.BroadcastAsyncStream', '1.0.2'
 end
 
 post_install do |installer|

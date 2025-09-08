@@ -53,6 +53,7 @@
 		17AC9F7928AA79C400DF8A2B /* IMG_0010.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = IMG_0010.JPG; sourceTree = "<group>"; };
 		17AC9F7C28AA7D1900DF8A2B /* ImagePreviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePreviewViewController.swift; sourceTree = "<group>"; };
 		7D5FFB42026834FF4A82D3F4 /* Pods-VideoCamera_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VideoCamera_Example.debug.xcconfig"; path = "Target Support Files/Pods-VideoCamera_Example/Pods-VideoCamera_Example.debug.xcconfig"; sourceTree = "<group>"; };
+		B8B88D1D2E6F08E100A68A2D /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		BD6083E76898E6302FE45AFA /* Pods_VideoCamera_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VideoCamera_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E5A60701F8795E1B08DA8B1D /* Pods-VideoCamera_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VideoCamera_Example.release.xcconfig"; path = "Target Support Files/Pods-VideoCamera_Example/Pods-VideoCamera_Example.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -122,6 +123,7 @@
 		6B9CC1A928D85DC800DE744A /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				B8B88D1C2E6F08B000A68A2D /* SwiftUI */,
 				17AC9F6F28AA796A00DF8A2B /* Example.swift */,
 				17AC9F7528AA79A200DF8A2B /* ExampleImageProcessorViewController.swift */,
 				17AC9F7328AA798F00DF8A2B /* ExampleSelectorViewController.swift */,
@@ -139,6 +141,14 @@
 				E5A60701F8795E1B08DA8B1D /* Pods-VideoCamera_Example.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		B8B88D1C2E6F08B000A68A2D /* SwiftUI */ = {
+			isa = PBXGroup;
+			children = (
+				B8B88D1D2E6F08E100A68A2D /* CameraView.swift */,
+			);
+			path = SwiftUI;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -261,9 +271,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-VideoCamera_Example/Pods-VideoCamera_Example-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-VideoCamera_Example/Pods-VideoCamera_Example-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
