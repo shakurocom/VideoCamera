@@ -8,7 +8,7 @@ analyzer_rules: # Rules run by `swiftlint analyze` (experimental)
     - unused_import
 
 deployment_target:
-    iOS_deployment_target: 15.0
+    iOS_deployment_target: 16.0
 
 closure_body_length:
     warning: 30

@@ -11,6 +11,7 @@ import UIKit
 /**
  Camera authorization status will be requested upon initialization in background thread.
  */
+@MainActor
 public protocol VideoCamera {
 
     var isInitialized: Bool { get }

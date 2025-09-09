@@ -14,7 +14,7 @@ Wrapper around AVFoundation camera. Works with several data outputs, such as met
 
 ## Requirements
 
-- iOS 15.0+
+- iOS 16.0+
 - Xcode 16.0+
 - Swift 5.0+
 

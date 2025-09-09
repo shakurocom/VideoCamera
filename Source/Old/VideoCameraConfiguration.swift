@@ -10,7 +10,7 @@ import UIKit
 /**
  Initial configuration for video camera.
  */
-public struct VideoCameraConfiguration: Sendable {
+public struct VideoCameraConfiguration: @unchecked Sendable {
 
     // MARK: Generic
     public var flashColor: UIColor?

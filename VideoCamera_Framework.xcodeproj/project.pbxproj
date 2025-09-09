@@ -21,6 +21,18 @@
 		17AC9F6D28AA789C00DF8A2B /* CGSize+Aspect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AC9F6B28AA789C00DF8A2B /* CGSize+Aspect.swift */; };
 		17AC9F6E28AA789C00DF8A2B /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AC9F6C28AA789C00DF8A2B /* ImageProcessor.swift */; };
 		6B473CB128E7109D0040D82B /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 6B473CB028E7109C0040D82B /* .swiftlint.yml */; };
+		B8A704A52E7048CA0028A33E /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704A42E7048CA0028A33E /* Camera.swift */; };
+		B8A704A72E7049130028A33E /* DataTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704A62E7049130028A33E /* DataTypes.swift */; };
+		B8A704A92E7049670028A33E /* CameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704A82E7049670028A33E /* CameraPreview.swift */; };
+		B8A704AB2E704A790028A33E /* CameraModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704AA2E704A790028A33E /* CameraModel.swift */; };
+		B8A704AF2E704C620028A33E /* MediaLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704AE2E704C620028A33E /* MediaLibrary.swift */; };
+		B8A704B12E704CAD0028A33E /* CaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704B02E704CAD0028A33E /* CaptureService.swift */; };
+		B8A704B42E705F420028A33E /* PhotoCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704B32E705F420028A33E /* PhotoCapture.swift */; };
+		B8A704B52E705F420028A33E /* MovieCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704B22E705F420028A33E /* MovieCapture.swift */; };
+		B8A704B82E705F550028A33E /* SystemPreferredCameraObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704B72E705F550028A33E /* SystemPreferredCameraObserver.swift */; };
+		B8A704B92E705F550028A33E /* DeviceLookup.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704B62E705F550028A33E /* DeviceLookup.swift */; };
+		B8A704BB2E705F870028A33E /* CaptureExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704BA2E705F870028A33E /* CaptureExtensions.swift */; };
+		B8A704BE2E7063BE0028A33E /* FoundationExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704BD2E7063BE0028A33E /* FoundationExtensions.swift */; };
 		F0F52CE8E9352C65349BF4F2 /* Pods_VideoCamera_Framework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 871BB38F66EB1C030CCB7C41 /* Pods_VideoCamera_Framework.framework */; };
 /* End PBXBuildFile section */
 
@@ -45,6 +57,18 @@
 		17AC9F6C28AA789C00DF8A2B /* ImageProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageProcessor.swift; sourceTree = "<group>"; };
 		6B473CB028E7109C0040D82B /* .swiftlint.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		871BB38F66EB1C030CCB7C41 /* Pods_VideoCamera_Framework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VideoCamera_Framework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B8A704A42E7048CA0028A33E /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Camera.swift; sourceTree = "<group>"; };
+		B8A704A62E7049130028A33E /* DataTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTypes.swift; sourceTree = "<group>"; };
+		B8A704A82E7049670028A33E /* CameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreview.swift; sourceTree = "<group>"; };
+		B8A704AA2E704A790028A33E /* CameraModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModel.swift; sourceTree = "<group>"; };
+		B8A704AE2E704C620028A33E /* MediaLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaLibrary.swift; sourceTree = "<group>"; };
+		B8A704B02E704CAD0028A33E /* CaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureService.swift; sourceTree = "<group>"; };
+		B8A704B22E705F420028A33E /* MovieCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieCapture.swift; sourceTree = "<group>"; };
+		B8A704B32E705F420028A33E /* PhotoCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCapture.swift; sourceTree = "<group>"; };
+		B8A704B62E705F550028A33E /* DeviceLookup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceLookup.swift; sourceTree = "<group>"; };
+		B8A704B72E705F550028A33E /* SystemPreferredCameraObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemPreferredCameraObserver.swift; sourceTree = "<group>"; };
+		B8A704BA2E705F870028A33E /* CaptureExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureExtensions.swift; sourceTree = "<group>"; };
+		B8A704BD2E7063BE0028A33E /* FoundationExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationExtensions.swift; sourceTree = "<group>"; };
 		B8F246F75AC3F4D07B44EA08 /* Pods-VideoCamera_Framework.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VideoCamera_Framework.debug.xcconfig"; path = "Target Support Files/Pods-VideoCamera_Framework/Pods-VideoCamera_Framework.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -95,6 +119,18 @@
 		17AC9F5828AA771F00DF8A2B /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				B8A704AA2E704A790028A33E /* CameraModel.swift */,
+				B8A704B02E704CAD0028A33E /* CaptureService.swift */,
+				B8A704B22E705F420028A33E /* MovieCapture.swift */,
+				B8A704B32E705F420028A33E /* PhotoCapture.swift */,
+				B8A704B62E705F550028A33E /* DeviceLookup.swift */,
+				B8A704B72E705F550028A33E /* SystemPreferredCameraObserver.swift */,
+				B8A704A42E7048CA0028A33E /* Camera.swift */,
+				B8A704A62E7049130028A33E /* DataTypes.swift */,
+				B8A704A82E7049670028A33E /* CameraPreview.swift */,
+				B8A704AE2E704C620028A33E /* MediaLibrary.swift */,
+				B8A704BA2E705F870028A33E /* CaptureExtensions.swift */,
+				B8A704BD2E7063BE0028A33E /* FoundationExtensions.swift */,
 				B8B88D1E2E6F090400A68A2D /* Old */,
 			);
 			path = Source;
@@ -242,16 +278,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B8A704B42E705F420028A33E /* PhotoCapture.swift in Sources */,
+				B8A704B52E705F420028A33E /* MovieCapture.swift in Sources */,
+				B8A704B12E704CAD0028A33E /* CaptureService.swift in Sources */,
 				17AC9F6228AA771F00DF8A2B /* VideoCameraError.swift in Sources */,
 				17AC9F6E28AA789C00DF8A2B /* ImageProcessor.swift in Sources */,
+				B8A704AF2E704C620028A33E /* MediaLibrary.swift in Sources */,
+				B8A704AB2E704A790028A33E /* CameraModel.swift in Sources */,
 				17AC9F6828AA771F00DF8A2B /* DeviceCameraPreviewView.swift in Sources */,
+				B8A704A92E7049670028A33E /* CameraPreview.swift in Sources */,
 				17AC9F6928AA771F00DF8A2B /* SimulatorCameraPreviewView.swift in Sources */,
 				17AC9F6A28AA771F00DF8A2B /* VideoCameraPreviewView.swift in Sources */,
 				17AC9F6528AA771F00DF8A2B /* VideoCameraConfiguration.swift in Sources */,
+				B8A704BB2E705F870028A33E /* CaptureExtensions.swift in Sources */,
+				B8A704A72E7049130028A33E /* DataTypes.swift in Sources */,
 				17AC9F6728AA771F00DF8A2B /* VideoCamera.swift in Sources */,
 				17AC9F6628AA771F00DF8A2B /* SimulatorCamera.swift in Sources */,
+				B8A704A52E7048CA0028A33E /* Camera.swift in Sources */,
 				17AC9F6328AA771F00DF8A2B /* VideoCameraFactory.swift in Sources */,
 				17AC9F6D28AA789C00DF8A2B /* CGSize+Aspect.swift in Sources */,
+				B8A704B82E705F550028A33E /* SystemPreferredCameraObserver.swift in Sources */,
+				B8A704BE2E7063BE0028A33E /* FoundationExtensions.swift in Sources */,
+				B8A704B92E705F550028A33E /* DeviceLookup.swift in Sources */,
 				17AC9F6428AA771F00DF8A2B /* DeviceCamera.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -396,7 +444,7 @@
 				INFOPLIST_FILE = VideoCamera_Framework/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -426,7 +474,7 @@
 				INFOPLIST_FILE = VideoCamera_Framework/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

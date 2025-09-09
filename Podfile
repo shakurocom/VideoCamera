@@ -1,6 +1,6 @@
 source 'https://github.com/CocoaPods/Specs.git'
 
-platform :ios, '15.0'
+platform :ios, '16.0'
 
 use_frameworks!
 
