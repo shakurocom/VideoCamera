@@ -52,7 +52,7 @@ actor CaptureService {
     private let systemPreferredCamera = SystemPreferredCameraObserver()
     
     // An object that monitors video device rotations.
-    private var rotationCoordinator: AVCaptureDevice.RotationCoordinator!
+//    private var rotationCoordinator: AVCaptureDevice.RotationCoordinator!
     private var rotationObservers = [AnyObject]()
     
     // A Boolean value that indicates whether the actor finished its required configuration.
@@ -62,10 +62,10 @@ actor CaptureService {
     private var controlsDelegate = CaptureControlsDelegate()
     
     // A map that stores capture controls by device identifier.
-    private var controlsMap: [String: [AVCaptureControl]] = [:]
+//    private var controlsMap: [String: [AVCaptureControl]] = [:]
     
     // A serial dispatch queue to use for capture control actions.
-    private let sessionQueue = DispatchSerialQueue(label: "com.example.apple-samplecode.AVCam.sessionQueue")
+//    private let sessionQueue = DispatchSerialQueue(label: "com.example.apple-samplecode.AVCam.sessionQueue")
     
     // Sets the session queue as the actor's executor.
     // TODO: implement
@@ -126,7 +126,7 @@ actor CaptureService {
             let defaultMic = try deviceLookup.defaultMic
 
             // Enable using AirPods as a high-quality lapel microphone.
-            captureSession.configuresApplicationAudioSessionForBluetoothHighQualityRecording = true
+//            captureSession.configuresApplicationAudioSessionForBluetoothHighQualityRecording = true
 
             // Add inputs for the default camera and microphone devices.
             activeVideoInput = try addInput(for: defaultCamera)
@@ -144,11 +144,11 @@ actor CaptureService {
             }
             
             // Configure controls to use with the Camera Control.
-            configureControls(for: defaultCamera)
+//            configureControls(for: defaultCamera)
             // Monitor the system-preferred camera state.
             monitorSystemPreferredCamera()
             // Configure a rotation coordinator for the default video device.
-            createRotationCoordinator(for: defaultCamera)
+//            createRotationCoordinator(for: defaultCamera)
             // Observe changes to the default camera's subject area.
             observeSubjectAreaChanges(of: defaultCamera)
             // Update the service's advertised capabilities.
@@ -191,70 +191,70 @@ actor CaptureService {
     
     // MARK: - Capture controls
 
-    @available(iOS 18.0, *)
-    private func configureControls(for device: AVCaptureDevice) {
-        // TODO: implement
-        // Exit early if the host device doesn't support capture controls.
-        guard captureSession.supportsControls else { return }
-        
-        // Begin configuring the capture session.
-        captureSession.beginConfiguration()
-        
-        // Remove previously configured controls, if any.
-        for control in captureSession.controls {
-            captureSession.removeControl(control)
-        }
-        
-        // Create controls and add them to the capture session.
-        for control in createControls(for: device) {
-            if captureSession.canAddControl(control) {
-                captureSession.addControl(control)
-            } else {
-                logger.info("Unable to add control \(control).")
-            }
-        }
-        
-        // Set the controls delegate.
-        captureSession.setControlsDelegate(controlsDelegate, queue: sessionQueue)
-        
-        // Commit the capture session configuration.
-        captureSession.commitConfiguration()
-    }
+//    @available(iOS 18.0, *)
+//    private func configureControls(for device: AVCaptureDevice) {
+//        // TODO: implement
+//        // Exit early if the host device doesn't support capture controls.
+//        guard captureSession.supportsControls else { return }
+//        
+//        // Begin configuring the capture session.
+//        captureSession.beginConfiguration()
+//        
+//        // Remove previously configured controls, if any.
+//        for control in captureSession.controls {
+//            captureSession.removeControl(control)
+//        }
+//        
+//        // Create controls and add them to the capture session.
+//        for control in createControls(for: device) {
+//            if captureSession.canAddControl(control) {
+//                captureSession.addControl(control)
+//            } else {
+//                logger.info("Unable to add control \(control).")
+//            }
+//        }
+//        
+//        // Set the controls delegate.
+////        captureSession.setControlsDelegate(controlsDelegate, queue: sessionQueue)
+//        
+//        // Commit the capture session configuration.
+//        captureSession.commitConfiguration()
+//    }
     
-    @available(iOS 18.0, *)
-    func createControls(for device: AVCaptureDevice) -> [AVCaptureControl] {
-        // Retrieve the capture controls for this device, if they exist.
-        guard let controls = controlsMap[device.uniqueID] else {
-            // Define the default controls.
-            var controls = [
-                AVCaptureSystemZoomSlider(device: device),
-                AVCaptureSystemExposureBiasSlider(device: device)
-            ]
-            // Create a lens position control if the device supports setting a custom position.
-            if device.isLockingFocusWithCustomLensPositionSupported {
-                // Create a slider to adjust the value from 0 to 1.
-                let lensSlider = AVCaptureSlider("Lens Position", symbolName: "circle.dotted.circle", in: 0...1)
-                // Perform the slider's action on the session queue.
-                lensSlider.setActionQueue(sessionQueue) { lensPosition in
-                    do {
-                        try device.lockForConfiguration()
-                        device.setFocusModeLocked(lensPosition: lensPosition)
-                        device.unlockForConfiguration()
-                    } catch {
-                        logger.info("Unable to change the lens position: \(error)")
-                    }
-                }
-                // Add the slider the controls array.
-                controls.append(lensSlider)
-            }
-            // Store the controls for future use.
-            controlsMap[device.uniqueID] = controls
-            return controls
-        }
-        
-        // Return the previously created controls.
-        return controls
-    }
+//    @available(iOS 18.0, *)
+//    func createControls(for device: AVCaptureDevice) -> [AVCaptureControl] {
+//        // Retrieve the capture controls for this device, if they exist.
+//        guard let controls = controlsMap[device.uniqueID] else {
+//            // Define the default controls.
+//            var controls = [
+//                AVCaptureSystemZoomSlider(device: device),
+//                AVCaptureSystemExposureBiasSlider(device: device)
+//            ]
+//            // Create a lens position control if the device supports setting a custom position.
+//            if device.isLockingFocusWithCustomLensPositionSupported {
+//                // Create a slider to adjust the value from 0 to 1.
+//                let lensSlider = AVCaptureSlider("Lens Position", symbolName: "circle.dotted.circle", in: 0...1)
+//                // Perform the slider's action on the session queue.
+//                lensSlider.setActionQueue(sessionQueue) { lensPosition in
+//                    do {
+//                        try device.lockForConfiguration()
+//                        device.setFocusModeLocked(lensPosition: lensPosition)
+//                        device.unlockForConfiguration()
+//                    } catch {
+//                        logger.info("Unable to change the lens position: \(error)")
+//                    }
+//                }
+//                // Add the slider the controls array.
+//                controls.append(lensSlider)
+//            }
+//            // Store the controls for future use.
+//            controlsMap[device.uniqueID] = controls
+//            return controls
+//        }
+//        
+//        // Return the previously created controls.
+//        return controls
+//    }
     
     // MARK: - Capture mode selection
     
@@ -313,7 +313,7 @@ actor CaptureService {
         
         // The app only calls this method in response to the user requesting to switch cameras.
         // Set the new selection as the user's preferred camera.
-        AVCaptureDevice.userPreferredCamera = nextDevice
+//        AVCaptureDevice.userPreferredCamera = nextDevice
     }
     
     // Changes the device the service uses for video capture.
@@ -332,10 +332,10 @@ actor CaptureService {
             activeVideoInput = try addInput(for: device)
             // Configure capture controls for new device selection.
             if #available(iOS 18.0, *) {
-                configureControls(for: device)
+//                configureControls(for: device)
             }
             // Configure a new rotation coordinator for the new device.
-            createRotationCoordinator(for: device)
+//            createRotationCoordinator(for: device)
             // Register for device observations.
             observeSubjectAreaChanges(of: device)
             // Update the service's advertised capabilities.
@@ -368,40 +368,40 @@ actor CaptureService {
     // MARK: - Rotation handling
     
     /// Create a new rotation coordinator for the specified device and observe its state to monitor rotation changes.
-    private func createRotationCoordinator(for device: AVCaptureDevice) {
-        // Create a new rotation coordinator for this device.
-        rotationCoordinator = AVCaptureDevice.RotationCoordinator(device: device, previewLayer: videoPreviewLayer)
-        
-        // Set initial rotation state on the preview and output connections.
-        updatePreviewRotation(rotationCoordinator.videoRotationAngleForHorizonLevelPreview)
-        updateCaptureRotation(rotationCoordinator.videoRotationAngleForHorizonLevelCapture)
-        
-        // Cancel previous observations.
-        rotationObservers.removeAll()
-        
-        // Add observers to monitor future changes.
-        rotationObservers.append(
-            rotationCoordinator.observe(\.videoRotationAngleForHorizonLevelPreview, options: .new) { [weak self] _, change in
-                guard let self, let angle = change.newValue else { return }
-                // Update the capture preview rotation.
-                Task { await self.updatePreviewRotation(angle) }
-            }
-        )
-        
-        rotationObservers.append(
-            rotationCoordinator.observe(\.videoRotationAngleForHorizonLevelCapture, options: .new) { [weak self] _, change in
-                guard let self, let angle = change.newValue else { return }
-                // Update the capture preview rotation.
-                Task { await self.updateCaptureRotation(angle) }
-            }
-        )
-    }
+//    private func createRotationCoordinator(for device: AVCaptureDevice) {
+//        // Create a new rotation coordinator for this device.
+//        rotationCoordinator = AVCaptureDevice.RotationCoordinator(device: device, previewLayer: videoPreviewLayer)
+//        
+//        // Set initial rotation state on the preview and output connections.
+//        updatePreviewRotation(rotationCoordinator.videoRotationAngleForHorizonLevelPreview)
+//        updateCaptureRotation(rotationCoordinator.videoRotationAngleForHorizonLevelCapture)
+//        
+//        // Cancel previous observations.
+//        rotationObservers.removeAll()
+//        
+//        // Add observers to monitor future changes.
+//        rotationObservers.append(
+//            rotationCoordinator.observe(\.videoRotationAngleForHorizonLevelPreview, options: .new) { [weak self] _, change in
+//                guard let self, let angle = change.newValue else { return }
+//                // Update the capture preview rotation.
+//                Task { await self.updatePreviewRotation(angle) }
+//            }
+//        )
+//        
+//        rotationObservers.append(
+//            rotationCoordinator.observe(\.videoRotationAngleForHorizonLevelCapture, options: .new) { [weak self] _, change in
+//                guard let self, let angle = change.newValue else { return }
+//                // Update the capture preview rotation.
+//                Task { await self.updateCaptureRotation(angle) }
+//            }
+//        )
+//    }
     
     private func updatePreviewRotation(_ angle: CGFloat) {
         let connection = videoPreviewLayer.connection
         Task { @MainActor in
             // Set initial rotation angle on the video preview.
-            connection?.videoRotationAngle = angle
+//            connection?.videoRotationAngle = angle
         }
     }
     

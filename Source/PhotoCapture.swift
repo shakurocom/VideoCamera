@@ -121,9 +121,9 @@ final class PhotoCapture: OutputService {
         photoOutput.maxPhotoDimensions = device.activeFormat.supportedMaxPhotoDimensions.last ?? .zero
         photoOutput.isLivePhotoCaptureEnabled = photoOutput.isLivePhotoCaptureSupported
         photoOutput.maxPhotoQualityPrioritization = .quality
-        photoOutput.isResponsiveCaptureEnabled = photoOutput.isResponsiveCaptureSupported
-        photoOutput.isFastCapturePrioritizationEnabled = photoOutput.isFastCapturePrioritizationSupported
-        photoOutput.isAutoDeferredPhotoDeliveryEnabled = photoOutput.isAutoDeferredPhotoDeliverySupported
+//        photoOutput.isResponsiveCaptureEnabled = photoOutput.isResponsiveCaptureSupported
+//        photoOutput.isFastCapturePrioritizationEnabled = photoOutput.isFastCapturePrioritizationSupported
+//        photoOutput.isAutoDeferredPhotoDeliveryEnabled = photoOutput.isAutoDeferredPhotoDeliverySupported
         updateCapabilities(for: device)
     }
     
@@ -185,15 +185,15 @@ private class PhotoCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate {
         livePhotoMovieURL = outputFileURL
     }
     
-    func photoOutput(_ output: AVCapturePhotoOutput, didFinishCapturingDeferredPhotoProxy deferredPhotoProxy: AVCaptureDeferredPhotoProxy?, error: Error?) {
-        if let error = error {
-            logger.debug("Error capturing deferred photo: \(error)")
-            return
-        }
-        // Capture the data for this photo.
-        photoData = deferredPhotoProxy?.fileDataRepresentation()
-        isProxyPhoto = true
-    }
+//    func photoOutput(_ output: AVCapturePhotoOutput, didFinishCapturingDeferredPhotoProxy deferredPhotoProxy: AVCaptureDeferredPhotoProxy?, error: Error?) {
+//        if let error = error {
+//            logger.debug("Error capturing deferred photo: \(error)")
+//            return
+//        }
+//        // Capture the data for this photo.
+//        photoData = deferredPhotoProxy?.fileDataRepresentation()
+//        isProxyPhoto = true
+//    }
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error = error {
