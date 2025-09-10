@@ -3,7 +3,7 @@ import AVFoundation
 // MARK: - Supporting types
 
 /// An enumeration that describes the current status of the camera.
-enum CameraStatus {
+public enum CameraStatus {
     /// The initial status upon creation.
     case unknown
     /// A status that indicates a person disallows access to the camera or microphone.
@@ -19,7 +19,7 @@ enum CameraStatus {
 /// An enumeration that defines the activity states the capture service supports.
 ///
 /// This type provides feedback to the UI regarding the active status of the `CaptureService` actor.
-enum CaptureActivity {
+public enum CaptureActivity {
     case idle
     /// A status that indicates the capture service is performing photo capture.
     case photoCapture(willCapture: Bool = false, isLivePhoto: Bool = false)
@@ -56,14 +56,14 @@ enum CaptureActivity {
 }
 
 /// An enumeration of the capture modes that the camera supports.
-enum CaptureMode: String, Identifiable, CaseIterable, Codable {
-    var id: Self { self }
+public enum CaptureMode: String, Identifiable, CaseIterable, Codable {
+    public var id: Self { self }
     /// A mode that enables photo capture.
     case photo
     /// A mode that enables video capture.
     case video
 
-    var systemName: String {
+    public var systemName: String {
         switch self {
         case .photo:
             "camera.fill"
@@ -107,15 +107,15 @@ struct CaptureCapabilities {
     static let unknown = CaptureCapabilities()
 }
 
-enum QualityPrioritization: Int, Identifiable, CaseIterable, CustomStringConvertible, Codable {
+public enum QualityPrioritization: Int, Identifiable, CaseIterable, CustomStringConvertible, Codable {
 
     case speed = 1
     case balanced
     case quality
 
-    var id: Self { self }
+    public var id: Self { self }
 
-    var description: String {
+    public var description: String {
         switch self {
         case.speed:
             return "Speed"

@@ -1,4 +1,4 @@
-import os
+import os.log
 import SwiftUI
 
 let logger = Logger()
@@ -12,8 +12,7 @@ let logger = Logger()
 /// For SwiftUI previews and Simulator, the app uses `PreviewCameraModel` instead.
 ///
 @MainActor
-
-final class CameraModel: ObservableObject, Camera {
+public final class CameraModel: ObservableObject, Camera {
 
     /// The current status of the camera, such as unauthorized, running, or failed.
     @Published private(set) var status = CameraStatus.unknown
@@ -54,7 +53,7 @@ final class CameraModel: ObservableObject, Camera {
     /// Persistent state shared between the app and capture extension.
     private var cameraState = CameraState()
 
-    init() {
+    public init() {
         //
     }
 

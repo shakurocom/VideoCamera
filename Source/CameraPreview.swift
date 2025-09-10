@@ -71,13 +71,13 @@ struct CameraPreview: UIViewRepresentable {
 /// the capture session to the `PreviewView` view. It uses these protocols
 /// to prevent explicitly exposing the capture objects to the UI layer.
 ///
-protocol PreviewSource: Sendable {
+public protocol PreviewSource: Sendable {
     // Connects a preview destination to this source.
     func connect(to target: PreviewTarget)
 }
 
 /// A protocol that passes the app's capture session to the `CameraPreview` view.
-protocol PreviewTarget {
+public protocol PreviewTarget {
     // Sets the capture session on the destination.
     func setSession(_ session: AVCaptureSession)
 }

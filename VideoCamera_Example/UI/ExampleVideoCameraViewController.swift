@@ -16,7 +16,10 @@ class ExampleVideoCameraViewController: UIViewController {
     @IBOutlet private var cameraAuthorizationLabel: UILabel!
 
     private var example: Example?
+
     private var camera: VideoCamera?
+
+    private var cameraModel: CameraModel = CameraModel()
 
     private var isNewCameraShown: Bool = true
 
