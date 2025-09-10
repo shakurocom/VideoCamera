@@ -1,4 +1,3 @@
-
 import os
 import SwiftUI
 
@@ -51,14 +50,14 @@ final class CameraModel: ObservableObject, Camera {
 
     /// An object that manages the app's capture functionality.
     private let captureService = CaptureService()
-    
+
     /// Persistent state shared between the app and capture extension.
     private var cameraState = CameraState()
-    
+
     init() {
         //
     }
-    
+
     // MARK: - Starting the camera
     /// Start the camera and begin the stream of data.
     func start() async {
@@ -79,20 +78,20 @@ final class CameraModel: ObservableObject, Camera {
             status = .failed
         }
     }
-    
+
     /// Synchronizes the persistent camera state.
     ///
     /// `CameraState` represents the persistent state, such as the capture mode, that the app and extension share.
     func syncState() async {
-        cameraState = await CameraState.current
+        //        cameraState = await CameraState.current
         captureMode = cameraState.captureMode
         qualityPrioritization = cameraState.qualityPrioritization
         isLivePhotoEnabled = cameraState.isLivePhotoEnabled
         isHDRVideoEnabled = cameraState.isVideoHDREnabled
     }
-    
+
     // MARK: - Changing modes and devices
-    
+
     /// A value that indicates the mode of capture for the camera.
     var captureMode = CaptureMode.photo {
         didSet {
@@ -107,16 +106,16 @@ final class CameraModel: ObservableObject, Camera {
             }
         }
     }
-    
+
     /// Selects the next available video device for capture.
     func switchVideoDevices() async {
         isSwitchingVideoDevices = true
         defer { isSwitchingVideoDevices = false }
         await captureService.selectNextVideoDevice()
     }
-    
+
     // MARK: - Photo capture
-    
+
     /// Captures a photo and writes it to the user's Photos library.
     func capturePhoto() async {
         do {
@@ -127,7 +126,7 @@ final class CameraModel: ObservableObject, Camera {
             self.error = error
         }
     }
-    
+
     /// A Boolean value that indicates whether to capture Live Photos when capturing stills.
     var isLivePhotoEnabled = true {
         didSet {
@@ -135,7 +134,7 @@ final class CameraModel: ObservableObject, Camera {
             cameraState.isLivePhotoEnabled = isLivePhotoEnabled
         }
     }
-    
+
     /// A value that indicates how to balance the photo capture quality versus speed.
     var qualityPrioritization = QualityPrioritization.quality {
         didSet {
@@ -143,12 +142,12 @@ final class CameraModel: ObservableObject, Camera {
             cameraState.qualityPrioritization = qualityPrioritization
         }
     }
-    
+
     /// Performs a focus and expose operation at the specified screen point.
     func focusAndExpose(at point: CGPoint) async {
         await captureService.focusAndExpose(at: point)
     }
-    
+
     /// Sets the `showCaptureFeedback` state to indicate that capture is underway.
     private func flashScreen() {
         shouldFlashScreen = true
@@ -156,7 +155,7 @@ final class CameraModel: ObservableObject, Camera {
             shouldFlashScreen = false
         }
     }
-    
+
     // MARK: - Video capture
     /// A Boolean value that indicates whether the camera captures video in HDR format.
     var isHDRVideoEnabled = false {
@@ -169,7 +168,7 @@ final class CameraModel: ObservableObject, Camera {
             }
         }
     }
-    
+
     /// Toggles the state of recording.
     func toggleRecording() async {
         switch await captureService.captureActivity {
@@ -186,9 +185,9 @@ final class CameraModel: ObservableObject, Camera {
             await captureService.startRecording()
         }
     }
-    
+
     // MARK: - Internal state observations
-    
+
     // Set up camera's state observations.
     private func observeState() {
         Task {
@@ -197,36 +196,36 @@ final class CameraModel: ObservableObject, Camera {
                 self.thumbnail = thumbnail
             }
         }
-        
+
         Task {
             // Await new capture activity values from the capture service.
-            for await activity in await captureService.$captureActivity.values {
-                if activity.willCapture {
-                    // Flash the screen to indicate capture is starting.
-                    flashScreen()
-                } else {
-                    // Forward the activity to the UI.
-                    captureActivity = activity
-                }
-            }
+//            for await activity in await captureService.$captureActivity.values {
+//                if activity.willCapture {
+//                    // Flash the screen to indicate capture is starting.
+//                    flashScreen()
+//                } else {
+//                    // Forward the activity to the UI.
+//                    captureActivity = activity
+//                }
+//            }
         }
-        
+
         Task {
             // Await updates to the capabilities that the capture service advertises.
-            for await capabilities in await captureService.$captureCapabilities.values {
-                isHDRVideoSupported = capabilities.isHDRSupported
-                cameraState.isVideoHDRSupported = capabilities.isHDRSupported
-            }
+//            for await capabilities in await captureService.$captureCapabilities.values {
+//                isHDRVideoSupported = capabilities.isHDRSupported
+//                cameraState.isVideoHDRSupported = capabilities.isHDRSupported
+//            }
         }
-        
+
         Task {
             // Await updates to a person's interaction with the Camera Control HUD.
-            for await isShowingFullscreenControls in await captureService.$isShowingFullscreenControls.values {
-                withAnimation {
-                    // Prefer showing a minimized UI when capture controls enter a fullscreen appearance.
-                    prefersMinimizedUI = isShowingFullscreenControls
-                }
-            }
+//            for await isShowingFullscreenControls in await captureService.$isShowingFullscreenControls.values {
+//                withAnimation {
+//                    // Prefer showing a minimized UI when capture controls enter a fullscreen appearance.
+//                    prefersMinimizedUI = isShowingFullscreenControls
+//                }
+//            }
         }
     }
 }

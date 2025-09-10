@@ -1,4 +1,3 @@
-
 import AVFoundation
 
 // MARK: - Supporting types
@@ -49,7 +48,7 @@ enum CaptureActivity {
     }
 
     var isRecording: Bool {
-        if case .movieCapture(_) = self {
+        if case .movieCapture = self {
             return true
         }
         return false
@@ -109,10 +108,13 @@ struct CaptureCapabilities {
 }
 
 enum QualityPrioritization: Int, Identifiable, CaseIterable, CustomStringConvertible, Codable {
-    var id: Self { self }
+
     case speed = 1
     case balanced
     case quality
+
+    var id: Self { self }
+
     var description: String {
         switch self {
         case.speed:
@@ -123,6 +125,7 @@ enum QualityPrioritization: Int, Identifiable, CaseIterable, CustomStringConvert
             return "Quality"
         }
     }
+
 }
 
 enum CameraError: Error {
@@ -135,12 +138,16 @@ enum CameraError: Error {
 }
 
 protocol OutputService {
+
     associatedtype Output: AVCaptureOutput
+
     var output: Output { get }
     var captureActivity: CaptureActivity { get }
     var capabilities: CaptureCapabilities { get }
+
     func updateConfiguration(for device: AVCaptureDevice)
     func setVideoRotationAngle(_ angle: CGFloat)
+
 }
 
 extension OutputService {
