@@ -18,6 +18,8 @@ class ExampleVideoCameraViewController: UIViewController {
     private var example: Example?
     private var camera: VideoCamera?
 
+    private var isNewCameraShown: Bool = true
+
     // MARK: - Initialization
 
     override func viewDidLoad() {
@@ -25,17 +27,21 @@ class ExampleVideoCameraViewController: UIViewController {
 
         title = example?.title
 
-        var cameraConfig = VideoCameraConfiguration()
-        cameraConfig.cameraDelegate = self
-        cameraConfig.capturePhotoEnabled = true
-        cameraConfig.simulatedImage = UIImage(named: "IMG_0010.JPG")?.cgImage // you can leave this value as nil to use default image
-        let videoCamera = VideoCameraFactory.createCamera(configuration: cameraConfig)
-        let previewView = videoCamera.previewView
-        previewView.translatesAutoresizingMaskIntoConstraints = true
-        previewView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        previewView.frame = previewContainerView.bounds
-        previewContainerView.addSubview(previewView)
-        camera = videoCamera
+        if isNewCameraShown {
+
+        } else {
+            var cameraConfig = VideoCameraConfiguration()
+            cameraConfig.cameraDelegate = self
+            cameraConfig.capturePhotoEnabled = true
+            cameraConfig.simulatedImage = UIImage(named: "IMG_0010.JPG")?.cgImage // you can leave this value as nil to use default image
+            let videoCamera = VideoCameraFactory.createCamera(configuration: cameraConfig)
+            let previewView = videoCamera.previewView
+            previewView.translatesAutoresizingMaskIntoConstraints = true
+            previewView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            previewView.frame = previewContainerView.bounds
+            previewContainerView.addSubview(previewView)
+            camera = videoCamera
+        }
 
         cameraAuthorizationLabel.text = nil
 
@@ -47,76 +53,104 @@ class ExampleVideoCameraViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        camera?.startSession()
+        if isNewCameraShown {
+
+        } else {
+            camera?.startSession()
+        }
     }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        camera?.stopSession()
+        if isNewCameraShown {
+
+        } else {
+            camera?.stopSession()
+        }
     }
 
     // MARK: - Interface callbacks
 
     @IBAction private func flashButtonTapped() {
-        camera?.setNextFlashMode()
+        if isNewCameraShown {
+
+        } else {
+            camera?.setNextFlashMode()
+        }
     }
 
     @IBAction private func torchButtonTapped() {
-        camera?.selectNextTorchMode()
+        if isNewCameraShown {
+
+        } else {
+            camera?.selectNextTorchMode()
+        }
     }
 
     @IBAction private func takePhotoButtonTapped() {
         takePhotoButton.isEnabled = false
-        camera?.capturePhoto(completionBlock: { (imageData: Data?, error: Error?) in
-            DispatchQueue.main.async(execute: {
-                if let realError = error {
-                    self.showErrorAlert(error: realError)
-                } else {
-                    var image: UIImage?
-                    if let data = imageData {
-                        image = UIImage(data: data)
+        if isNewCameraShown {
+
+        } else {
+            camera?.capturePhoto(completionBlock: { (imageData: Data?, error: Error?) in
+                DispatchQueue.main.async(execute: {
+                    if let realError = error {
+                        self.showErrorAlert(error: realError)
+                    } else {
+                        var image: UIImage?
+                        if let data = imageData {
+                            image = UIImage(data: data)
+                        }
+                        let imageVC = ImagePreviewViewController.instantiate(image: image)
+                        self.navigationController?.pushViewController(imageVC, animated: true)
                     }
-                    let imageVC = ImagePreviewViewController.instantiate(image: image)
-                    self.navigationController?.pushViewController(imageVC, animated: true)
-                }
-                self.takePhotoButton.isEnabled = true
+                    self.takePhotoButton.isEnabled = true
+                })
             })
-        })
+        }
     }
 
     // MARK: - Private
 
     private func updateFlashButton() {
-        if let flashMode = camera?.flashMode {
-            let newTitle: String
-            switch flashMode {
-            case .off:
-                newTitle = "flash: off"
-            case .on:
-                newTitle = "flash: on"
-            case .auto:
-                newTitle = "flash: auto"
-            @unknown default:
-                fatalError("unknown flash mode")
+        if isNewCameraShown {
+
+        } else {
+            if let flashMode = camera?.flashMode {
+                let newTitle: String
+                switch flashMode {
+                case .off:
+                    newTitle = "flash: off"
+                case .on:
+                    newTitle = "flash: on"
+                case .auto:
+                    newTitle = "flash: auto"
+                @unknown default:
+                    fatalError("unknown flash mode")
+                }
+                flashButton.setTitle(newTitle, for: UIControl.State.normal)
             }
-            flashButton.setTitle(newTitle, for: UIControl.State.normal)
         }
     }
 
     private func updateTorchButton() {
-        if let torchMode = camera?.torchMode {
-            let newTitle: String
-            switch torchMode {
-            case .off:
-                newTitle = "torch: off"
-            case .on:
-                newTitle = "torch: on"
-            case .auto:
-                newTitle = "torch: auto"
-            @unknown default:
-                fatalError("unknown torch mode")
+        if isNewCameraShown {
+
+        } else {
+            if let torchMode = camera?.torchMode {
+                let newTitle: String
+                switch torchMode {
+                case .off:
+                    newTitle = "torch: off"
+                case .on:
+                    newTitle = "torch: on"
+                case .auto:
+                    newTitle = "torch: auto"
+                @unknown default:
+                    fatalError("unknown torch mode")
+                }
+                torchButton.setTitle(newTitle, for: UIControl.State.normal)
             }
-            torchButton.setTitle(newTitle, for: UIControl.State.normal)
         }
     }
 
