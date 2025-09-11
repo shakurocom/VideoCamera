@@ -19,7 +19,7 @@ public enum CameraStatus {
 /// An enumeration that defines the activity states the capture service supports.
 ///
 /// This type provides feedback to the UI regarding the active status of the `CaptureService` actor.
-public enum CaptureActivity {
+public enum CaptureActivity: Sendable {
     case idle
     /// A status that indicates the capture service is performing photo capture.
     case photoCapture(willCapture: Bool = false, isLivePhoto: Bool = false)
@@ -53,15 +53,18 @@ public enum CaptureActivity {
         }
         return false
     }
+
 }
 
 /// An enumeration of the capture modes that the camera supports.
-public enum CaptureMode: String, Identifiable, CaseIterable, Codable {
-    public var id: Self { self }
+public enum CaptureMode: String, Identifiable, CaseIterable, Codable, Sendable {
+
     /// A mode that enables photo capture.
     case photo
     /// A mode that enables video capture.
     case video
+
+    public var id: Self { self }
 
     public var systemName: String {
         switch self {
@@ -71,6 +74,7 @@ public enum CaptureMode: String, Identifiable, CaseIterable, Codable {
             "video.fill"
         }
     }
+
 }
 
 /// A structure that represents a captured photo.
@@ -107,7 +111,7 @@ struct CaptureCapabilities {
     static let unknown = CaptureCapabilities()
 }
 
-public enum QualityPrioritization: Int, Identifiable, CaseIterable, CustomStringConvertible, Codable {
+public enum QualityPrioritization: Int, Identifiable, CaseIterable, CustomStringConvertible, Codable, Sendable {
 
     case speed = 1
     case balanced

@@ -12,8 +12,8 @@
 	"argv": [
 		"/usr/local/bin/xcode-build-server"
 	],
-	"workspace": "/Users/istoreappleshop/Documents/Development/VideoCamera/VideoCamera.xcworkspace",
-	"build_root": "/Users/istoreappleshop/Library/Developer/Xcode/DerivedData/VideoCamera-fnnxbuxyikouptfbjosttkzrunrz",
+	"workspace": "/Users/wwwpix/Documents/Development/iOS/VideoCamera/VideoCamera_Example.xcodeproj/project.xcworkspace",
+	"build_root": "/Users/wwwpix/Library/Developer/Xcode/DerivedData/VideoCamera_Example-aajzakazaymwrtfgdenzmcdecxco",
 	"scheme": "VideoCamera_Example",
 	"kind": "xcode"
 }

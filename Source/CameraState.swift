@@ -1,6 +1,6 @@
 import Foundation
 
-struct CameraState {
+struct CameraState: Sendable {
     var isLivePhotoEnabled = true
     var qualityPrioritization = QualityPrioritization.quality
     var isVideoHDRSupported = true

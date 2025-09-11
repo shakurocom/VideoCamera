@@ -30,13 +30,15 @@ class SystemPreferredCameraObserver: NSObject {
     }
 
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-//        switch keyPath {
-//        case systemPreferredKeyPath:
+        switch keyPath {
+        case systemPreferredKeyPath:
             // Update the observer's system-preferred camera value.
-//            let newDevice = change?[.newKey] as? AVCaptureDevice
-//            continuation?.yield(newDevice)
-//        default:
+            let newDevice = change?[.newKey] as? AVCaptureDevice
+            print("newDevice is \(String(describing: newDevice))")
+//            continuation?.yield(newDevice) // TODO: implement
+        default:
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-//        }
+        }
     }
+
 }
