@@ -1,22 +1,22 @@
 import SwiftUI
 @preconcurrency import AVFoundation
 
-struct CameraPreview: UIViewRepresentable {
+public struct CameraPreview: UIViewRepresentable {
 
     private let source: PreviewSource
 
-    init(source: PreviewSource) {
+    public init(source: PreviewSource) {
         self.source = source
     }
 
-    func makeUIView(context: Context) -> PreviewView {
+    public func makeUIView(context: Context) -> PreviewView {
         let preview = PreviewView()
         // Connect the preview layer to the capture session.
         source.connect(to: preview)
         return preview
     }
 
-    func updateUIView(_ previewView: PreviewView, context: Context) {
+    public func updateUIView(_ previewView: PreviewView, context: Context) {
         // No-op.
     }
 

@@ -1,13 +1,7 @@
-/*
-See the LICENSE.txt file for this sample’s licensing information.
-
-Abstract:
-The main user interface for the sample app.
-*/
-
-import SwiftUI
 import AVFoundation
 import AVKit
+import SwiftUI
+import VideoCamera_Framework
 
 @MainActor
 struct CameraView<CameraModel: Camera>: PlatformView {
@@ -43,7 +37,7 @@ struct CameraView<CameraModel: Camera>: PlatformView {
                             }
                             // Play a sound when capturing by clicking an AirPods stem.
                             if event.shouldPlaySound {
-                                event.pSwiftlay(sound)
+                                event.play(sound)
                             }
                         }
                     }

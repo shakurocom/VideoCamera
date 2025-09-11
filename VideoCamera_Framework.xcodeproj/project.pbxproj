@@ -22,6 +22,9 @@
 		17AC9F6E28AA789C00DF8A2B /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AC9F6C28AA789C00DF8A2B /* ImageProcessor.swift */; };
 		6B473CB128E7109D0040D82B /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 6B473CB028E7109C0040D82B /* .swiftlint.yml */; };
 		A565498B2E70A813000E28C3 /* CameraState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A565498A2E70A813000E28C3 /* CameraState.swift */; };
+		A5E5933B2E72DE4D000C3DE5 /* ViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E5933A2E72DE4D000C3DE5 /* ViewExtensions.swift */; };
+		A5E593422E72DFBA000C3DE5 /* PreviewCameraModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E593412E72DFBA000C3DE5 /* PreviewCameraModel.swift */; };
+		A5E593432E72DFBA000C3DE5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A5E593402E72DFBA000C3DE5 /* Preview Assets.xcassets */; };
 		B8A704A52E7048CA0028A33E /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704A42E7048CA0028A33E /* Camera.swift */; };
 		B8A704A72E7049130028A33E /* DataTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704A62E7049130028A33E /* DataTypes.swift */; };
 		B8A704A92E7049670028A33E /* CameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704A82E7049670028A33E /* CameraPreview.swift */; };
@@ -59,6 +62,9 @@
 		6B473CB028E7109C0040D82B /* .swiftlint.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		871BB38F66EB1C030CCB7C41 /* Pods_VideoCamera_Framework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VideoCamera_Framework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A565498A2E70A813000E28C3 /* CameraState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraState.swift; sourceTree = "<group>"; };
+		A5E5933A2E72DE4D000C3DE5 /* ViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtensions.swift; sourceTree = "<group>"; };
+		A5E593402E72DFBA000C3DE5 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		A5E593412E72DFBA000C3DE5 /* PreviewCameraModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewCameraModel.swift; sourceTree = "<group>"; };
 		B8A704A42E7048CA0028A33E /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Camera.swift; sourceTree = "<group>"; };
 		B8A704A62E7049130028A33E /* DataTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTypes.swift; sourceTree = "<group>"; };
 		B8A704A82E7049670028A33E /* CameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreview.swift; sourceTree = "<group>"; };
@@ -121,6 +127,8 @@
 		17AC9F5828AA771F00DF8A2B /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				A5E593402E72DFBA000C3DE5 /* Preview Assets.xcassets */,
+				A5E593412E72DFBA000C3DE5 /* PreviewCameraModel.swift */,
 				B8A704AA2E704A790028A33E /* CameraModel.swift */,
 				B8A704B02E704CAD0028A33E /* CaptureService.swift */,
 				A565498A2E70A813000E28C3 /* CameraState.swift */,
@@ -132,6 +140,7 @@
 				B8A704A62E7049130028A33E /* DataTypes.swift */,
 				B8A704AE2E704C620028A33E /* MediaLibrary.swift */,
 				B8A704BA2E705F870028A33E /* CaptureExtensions.swift */,
+				A5E5933A2E72DE4D000C3DE5 /* ViewExtensions.swift */,
 				B8A704BD2E7063BE0028A33E /* FoundationExtensions.swift */,
 				B8A704A82E7049670028A33E /* CameraPreview.swift */,
 				B8B88D1E2E6F090400A68A2D /* Old */,
@@ -245,6 +254,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6B473CB128E7109D0040D82B /* .swiftlint.yml in Resources */,
+				A5E593432E72DFBA000C3DE5 /* Preview Assets.xcassets in Resources */,
 				17AC9F3328AA75C300DF8A2B /* Shakuro.VideoCamera.podspec in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -284,6 +294,7 @@
 				B8A704B42E705F420028A33E /* PhotoCapture.swift in Sources */,
 				B8A704B52E705F420028A33E /* MovieCapture.swift in Sources */,
 				B8A704B12E704CAD0028A33E /* CaptureService.swift in Sources */,
+				A5E593422E72DFBA000C3DE5 /* PreviewCameraModel.swift in Sources */,
 				17AC9F6228AA771F00DF8A2B /* VideoCameraError.swift in Sources */,
 				17AC9F6E28AA789C00DF8A2B /* ImageProcessor.swift in Sources */,
 				B8A704AF2E704C620028A33E /* MediaLibrary.swift in Sources */,
@@ -299,6 +310,7 @@
 				17AC9F6728AA771F00DF8A2B /* VideoCamera.swift in Sources */,
 				17AC9F6628AA771F00DF8A2B /* SimulatorCamera.swift in Sources */,
 				B8A704A52E7048CA0028A33E /* Camera.swift in Sources */,
+				A5E5933B2E72DE4D000C3DE5 /* ViewExtensions.swift in Sources */,
 				17AC9F6328AA771F00DF8A2B /* VideoCameraFactory.swift in Sources */,
 				17AC9F6D28AA789C00DF8A2B /* CGSize+Aspect.swift in Sources */,
 				B8A704B82E705F550028A33E /* SystemPreferredCameraObserver.swift in Sources */,

@@ -20,34 +20,35 @@ public enum CameraStatus {
 ///
 /// This type provides feedback to the UI regarding the active status of the `CaptureService` actor.
 public enum CaptureActivity: Sendable {
+
     case idle
     /// A status that indicates the capture service is performing photo capture.
     case photoCapture(willCapture: Bool = false, isLivePhoto: Bool = false)
     /// A status that indicates the capture service is performing movie capture.
     case movieCapture(duration: TimeInterval = 0.0)
 
-    var isLivePhoto: Bool {
+    public var isLivePhoto: Bool {
         if case .photoCapture(_, let isLivePhoto) = self {
             return isLivePhoto
         }
         return false
     }
 
-    var willCapture: Bool {
+    public var willCapture: Bool {
         if case .photoCapture(let willCapture, _) = self {
             return willCapture
         }
         return false
     }
 
-    var currentTime: TimeInterval {
+    public var currentTime: TimeInterval {
         if case .movieCapture(let duration) = self {
             return duration
         }
         return .zero
     }
 
-    var isRecording: Bool {
+    public var isRecording: Bool {
         if case .movieCapture = self {
             return true
         }

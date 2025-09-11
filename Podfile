@@ -15,7 +15,14 @@ end
 target 'VideoCamera_Example' do
     project 'VideoCamera_Example.xcodeproj'
     pod 'Shakuro.CommonTypes', '1.9.5'
-    pod 'SwiftLint', '0.57.1'
+    pod 'SwiftLint'
+    pod 'Shakuro.BroadcastAsyncStream', '1.0.2'
+end
+
+target 'VideoCamera_ExampleSwiftUI' do
+    project 'VideoCamera_ExampleSwiftUI.xcodeproj'
+    pod 'Shakuro.CommonTypes', '1.9.5'
+    pod 'SwiftLint'
     pod 'Shakuro.BroadcastAsyncStream', '1.0.2'
 end
 

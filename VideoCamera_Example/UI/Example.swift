@@ -1,8 +1,3 @@
-//
-// Copyright (c) 2018-2020 Shakuro (https://shakuro.com/)
-// Sergey Laschuk
-//
-
 import UIKit
 
 @MainActor
