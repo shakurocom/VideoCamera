@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct VideoCamera_ExampleSwiftUIApp: App {
+struct VideoCameraExampleSwiftUIApp: App {
 
     var body: some Scene {
         WindowGroup {

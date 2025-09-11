@@ -1,11 +1,5 @@
-/*
-See the LICENSE.txt file for this sample’s licensing information.
-
-Abstract:
-A view that toggles the camera's capture mode.
-*/
-
 import SwiftUI
+import VideoCamera_Framework
 
 /// A view that toggles the camera's capture mode.
 struct CaptureModeView<CameraModel: Camera>: View {

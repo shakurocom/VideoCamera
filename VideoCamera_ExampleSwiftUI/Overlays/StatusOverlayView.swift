@@ -1,11 +1,5 @@
-/*
-See the LICENSE.txt file for this sample’s licensing information.
-
-Abstract:
-A view that presents a status message over the camera user interface.
-*/
-
 import SwiftUI
+import VideoCamera_Framework
 
 /// A view that presents a status message over the camera user interface.
 struct StatusOverlayView: View {
