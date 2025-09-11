@@ -62,16 +62,18 @@ actor CaptureService {
     private var controlsDelegate = CaptureControlsDelegate()
 
     // A map that stores capture controls by device identifier.
-    //    private var controlsMap: [String: [AVCaptureControl]] = [:]
+    private var controlsMap: [String: [Any]] = [:]
 
-    // A serial dispatch queue to use for capture control actions.
-    //    private let sessionQueue = DispatchSerialQueue(label: "com.example.apple-samplecode.AVCam.sessionQueue")
+    private let sessionQueue = DispatchQueue(label: "com.example.apple-samplecode.AVCam.sessionQueue")
 
-    // Sets the session queue as the actor's executor.
-    // TODO: implement
-    //    nonisolated var unownedExecutor: UnownedSerialExecutor {
-    //        sessionQueue.asUnownedSerialExecutor()
-    //    }
+    // Note: Custom actor executors via DispatchQueue.asUnownedSerialExecutor() are unavailable in this SDK/toolchain.
+    // The actor will use its default executor. If specific work must occur on a particular queue, dispatch to
+    // `sessionQueue` within those methods instead.
+    // If you target an SDK where DispatchQueue exposes `asUnownedSerialExecutor()`, you can restore the property below:
+    //
+    // nonisolated var unownedExecutor: UnownedSerialExecutor {
+    //     sessionQueue.asUnownedSerialExecutor()
+    // }
 
     init() {
         // Create a source object to connect the preview view with the capture session.
@@ -146,8 +148,9 @@ actor CaptureService {
                 setHDRVideoEnabled(isHDRVideoEnabled)
             }
 
-            // Configure controls to use with the Camera Control.
-            //            configureControls(for: defaultCamera)
+            if #available(iOS 18.0, *) {
+                configureControls(for: defaultCamera)
+            }
             // Monitor the system-preferred camera state.
             monitorSystemPreferredCamera()
             // Configure a rotation coordinator for the default video device.
@@ -194,70 +197,67 @@ actor CaptureService {
 
     // MARK: - Capture controls
 
-    //    @available(iOS 18.0, *)
-    //    private func configureControls(for device: AVCaptureDevice) {
-    //        // TODO: implement
-    //        // Exit early if the host device doesn't support capture controls.
-    //        guard captureSession.supportsControls else { return }
-    //
-    //        // Begin configuring the capture session.
-    //        captureSession.beginConfiguration()
-    //
-    //        // Remove previously configured controls, if any.
-    //        for control in captureSession.controls {
-    //            captureSession.removeControl(control)
-    //        }
-    //
-    //        // Create controls and add them to the capture session.
-    //        for control in createControls(for: device) {
-    //            if captureSession.canAddControl(control) {
-    //                captureSession.addControl(control)
-    //            } else {
-    //                logger.info("Unable to add control \(control).")
-    //            }
-    //        }
-    //
-    //        // Set the controls delegate.
-    ////        captureSession.setControlsDelegate(controlsDelegate, queue: sessionQueue)
-    //
-    //        // Commit the capture session configuration.
-    //        captureSession.commitConfiguration()
-    //    }
+    @available(iOS 18.0, *)
+    private func configureControls(for device: AVCaptureDevice) {
+        // Exit early if the host device doesn't support capture controls.
+        guard captureSession.supportsControls else { return }
 
-    //    @available(iOS 18.0, *)
-    //    func createControls(for device: AVCaptureDevice) -> [AVCaptureControl] {
-    //        // Retrieve the capture controls for this device, if they exist.
-    //        guard let controls = controlsMap[device.uniqueID] else {
-    //            // Define the default controls.
-    //            var controls = [
-    //                AVCaptureSystemZoomSlider(device: device),
-    //                AVCaptureSystemExposureBiasSlider(device: device)
-    //            ]
-    //            // Create a lens position control if the device supports setting a custom position.
-    //            if device.isLockingFocusWithCustomLensPositionSupported {
-    //                // Create a slider to adjust the value from 0 to 1.
-    //                let lensSlider = AVCaptureSlider("Lens Position", symbolName: "circle.dotted.circle", in: 0...1)
-    //                // Perform the slider's action on the session queue.
-    //                lensSlider.setActionQueue(sessionQueue) { lensPosition in
-    //                    do {
-    //                        try device.lockForConfiguration()
-    //                        device.setFocusModeLocked(lensPosition: lensPosition)
-    //                        device.unlockForConfiguration()
-    //                    } catch {
-    //                        logger.info("Unable to change the lens position: \(error)")
-    //                    }
-    //                }
-    //                // Add the slider the controls array.
-    //                controls.append(lensSlider)
-    //            }
-    //            // Store the controls for future use.
-    //            controlsMap[device.uniqueID] = controls
-    //            return controls
-    //        }
-    //
-    //        // Return the previously created controls.
-    //        return controls
-    //    }
+        // Begin configuring the capture session.
+        captureSession.beginConfiguration()
+
+        // Remove previously configured controls, if any.
+        for control in captureSession.controls {
+            captureSession.removeControl(control)
+        }
+
+        // Create controls and add them to the capture session.
+        for control in createControls(for: device) {
+            if captureSession.canAddControl(control) {
+                captureSession.addControl(control)
+            } else {
+                logger.info("Unable to add control \(control).")
+            }
+        }
+
+        // Set the controls delegate.
+        captureSession.setControlsDelegate(controlsDelegate, queue: sessionQueue)
+
+        // Commit the capture session configuration.
+        captureSession.commitConfiguration()
+    }
+
+    @available(iOS 18.0, *)
+    func createControls(for device: AVCaptureDevice) -> [AVCaptureControl] {
+        if let anyControls = controlsMap[device.uniqueID], let controls = anyControls as? [AVCaptureControl] {
+            return controls
+        }
+        // Define the default controls.
+        var controls: [AVCaptureControl] = [
+            AVCaptureSystemZoomSlider(device: device),
+            AVCaptureSystemExposureBiasSlider(device: device)
+        ]
+        // Create a lens position control if the device supports setting a custom position.
+        if device.isLockingFocusWithCustomLensPositionSupported {
+            // Create a slider to adjust the value from 0 to 1.
+            let lensSlider = AVCaptureSlider("Lens Position", symbolName: "circle.dotted.circle", in: 0...1)
+            // Perform the slider's action on the session queue.
+            lensSlider.setActionQueue(sessionQueue) { lensPosition in
+                do {
+                    try device.lockForConfiguration()
+                    device.setFocusModeLocked(lensPosition: lensPosition)
+                    device.unlockForConfiguration()
+                } catch {
+                    logger.info("Unable to change the lens position: \(error)")
+                }
+            }
+            // Add the slider the controls array.
+            controls.append(lensSlider)
+        }
+        // Store the controls for future use.
+        controlsMap[device.uniqueID] = controls.map { $0 as Any }
+        // Return typed controls.
+        return controls
+    }
 
     // MARK: - Capture mode selection
 
@@ -334,9 +334,9 @@ actor CaptureService {
             // Attempt to connect a new input and device to the capture session.
             activeVideoInput = try addInput(for: device)
             // Configure capture controls for new device selection.
-//            if #available(iOS 18.0, *) {
-                //                configureControls(for: device)
-//            }
+            if #available(iOS 18.0, *) {
+                configureControls(for: device)
+            }
             // Configure a new rotation coordinator for the new device.
             //            createRotationCoordinator(for: device)
             // Register for device observations.
@@ -604,3 +604,4 @@ class CaptureControlsDelegate: NSObject, AVCaptureSessionControlsDelegate {
         logger.debug("Capture controls inactive.")
     }
 }
+
