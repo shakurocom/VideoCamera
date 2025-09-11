@@ -31,7 +31,13 @@ class ExampleVideoCameraViewController: UIViewController {
         title = example?.title
 
         if isNewCameraShown {
-
+            let previewSource = cameraModel.previewSource
+            let previewView = PreviewView()
+            previewSource.connect(to: previewView)
+            previewView.translatesAutoresizingMaskIntoConstraints = true
+            previewView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            previewView.frame = previewContainerView.bounds
+            previewContainerView.addSubview(previewView)
         } else {
             var cameraConfig = VideoCameraConfiguration()
             cameraConfig.cameraDelegate = self
@@ -57,7 +63,9 @@ class ExampleVideoCameraViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if isNewCameraShown {
-
+            Task(operation: {
+                await cameraModel.start()
+            })
         } else {
             camera?.startSession()
         }

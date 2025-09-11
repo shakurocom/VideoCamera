@@ -122,14 +122,17 @@ actor CaptureService {
 
         do {
             // Retrieve the default camera and microphone.
-            //            let defaultCamera = try deviceLookup.defaultCamera // TODO: implement
+            // TODO: implement - add position: AVCaptureDevice.Position to configuration
+            guard let defaultCamera = deviceLookup.getCamera(position: .back) else {
+                throw CameraError.videoDeviceUnavailable
+            }
             let defaultMic = try deviceLookup.defaultMic
 
             // Enable using AirPods as a high-quality lapel microphone.
             //            captureSession.configuresApplicationAudioSessionForBluetoothHighQualityRecording = true
 
             // Add inputs for the default camera and microphone devices.
-            //            activeVideoInput = try addInput(for: defaultCamera)
+            activeVideoInput = try addInput(for: defaultCamera)
             try addInput(for: defaultMic)
 
             // Configure the session preset based on the current capture mode.
@@ -150,7 +153,7 @@ actor CaptureService {
             // Configure a rotation coordinator for the default video device.
             //            createRotationCoordinator(for: defaultCamera)
             // Observe changes to the default camera's subject area.
-            //            observeSubjectAreaChanges(of: defaultCamera) // TODO: implement
+            observeSubjectAreaChanges(of: defaultCamera)
             // Update the service's advertised capabilities.
             updateCaptureCapabilities()
 

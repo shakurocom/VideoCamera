@@ -34,14 +34,19 @@ final class DeviceLookup {
     }
 
     // Returns the system-preferred camera for the host system.
-    //    var defaultCamera: AVCaptureDevice {
-    //        get throws {
-    //            guard let videoDevice = AVCaptureDevice.systemPreferredCamera else {
-    //                throw CameraError.videoDeviceUnavailable
-    //            }
-    //            return videoDevice
-    //        }
-    //    }
+    @available(iOS 17.0, *)
+    var defaultCamera: AVCaptureDevice {
+        get throws {
+            guard let videoDevice = AVCaptureDevice.systemPreferredCamera else {
+                throw CameraError.videoDeviceUnavailable
+            }
+            return videoDevice
+        }
+    }
+
+    func getCamera(position: AVCaptureDevice.Position) -> AVCaptureDevice? {
+        return AVCaptureDevice.default(AVCaptureDevice.DeviceType.builtInWideAngleCamera, for: AVMediaType.video, position: position)
+    }
 
     /// Returns the default microphone for the device on which the app runs.
     var defaultMic: AVCaptureDevice {
