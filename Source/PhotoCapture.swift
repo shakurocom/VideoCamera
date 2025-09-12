@@ -6,16 +6,17 @@ enum PhotoCaptureError: Error {
 }
 
 /// An object that manages a photo capture output to perform take photographs.
+@CaptureServiceActor
 final class PhotoCapture: OutputService {
 
     /// A value that indicates the current state of photo capture.
     @Published private(set) var captureActivity: CaptureActivity = .idle
 
     /// The capture output type for this service.
-    let output = AVCapturePhotoOutput()
+    let avCaptureOutput = AVCapturePhotoOutput()
 
     // An internal alias for the output.
-    private var photoOutput: AVCapturePhotoOutput { output }
+    private var photoOutput: AVCapturePhotoOutput { avCaptureOutput }
 
     // The current capabilities available.
     private(set) var capabilities: CaptureCapabilities = .unknown
@@ -80,11 +81,12 @@ final class PhotoCapture: OutputService {
     /// The `PhotoCaptureDelegate` produces an asynchronous stream of values that indicate its current activity.
     /// The app propagates the activity values up to the view tier so the UI can update accordingly.
     private func monitorProgress(of delegate: PhotoCaptureDelegate, isolation: isolated (any Actor)? = #isolation) {
-        Task {
+        let activityStream = delegate.activityStream
+        Task { @CaptureServiceActor in
             _ = isolation
             var isLivePhoto = false
             // Asynchronously monitor the activity of the delegate while the system performs capture.
-            for await activity in delegate.activityStream {
+            for await activity in activityStream {
                 var currentActivity = activity
                 /// More than one activity value for the delegate may report that `isLivePhoto` is `true`.
                 /// Only increment/decrement the count when the value changes from its previous state.

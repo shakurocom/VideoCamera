@@ -9,15 +9,16 @@ import AVFoundation
 import Combine
 
 /// An object that manages a movie capture output to record videos.
+@CaptureServiceActor
 final class MovieCapture: OutputService {
 
     /// A value that indicates the current state of movie capture.
     @Published private(set) var captureActivity: CaptureActivity = .idle
 
     /// The capture output type for this service.
-    let output = AVCaptureMovieFileOutput()
+    let avCaptureOutput = AVCaptureMovieFileOutput()
     // An internal alias for the output.
-    private var movieOutput: AVCaptureMovieFileOutput { output }
+    private var movieOutput: AVCaptureMovieFileOutput { avCaptureOutput }
 
     // A delegate object to respond to movie capture events.
     private var delegate: MovieCaptureDelegate?

@@ -142,11 +142,12 @@ enum CameraError: Error {
     case deviceChangeFailed
 }
 
+@CaptureServiceActor
 protocol OutputService {
 
     associatedtype Output: AVCaptureOutput
 
-    var output: Output { get }
+    var avCaptureOutput: Output { get }
     var captureActivity: CaptureActivity { get }
     var capabilities: CaptureCapabilities { get }
 

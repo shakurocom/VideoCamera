@@ -9,9 +9,48 @@ import Foundation
 @preconcurrency import AVFoundation
 import Combine
 
+@globalActor actor CaptureServiceActor: GlobalActor {
+
+    internal static let shared = CaptureServiceActor()
+
+    nonisolated private let executor: any SerialExecutor = DispatchQueueExecutor(CaptureService.sessionQueue)
+
+    nonisolated var unownedExecutor: UnownedSerialExecutor {
+        return executor.asUnownedSerialExecutor()
+    }
+
+}
+
+private final class DispatchQueueExecutor: SerialExecutor {
+
+    private let queue: DispatchQueue
+
+    init(_ queue: DispatchQueue) {
+        self.queue = queue
+    }
+
+    public func enqueue(_ job: UnownedJob) {
+        self.queue.async {
+            job.runSynchronously(on: self.asUnownedSerialExecutor())
+        }
+    }
+
+    public func asUnownedSerialExecutor() -> UnownedSerialExecutor {
+        UnownedSerialExecutor(ordinary: self)
+    }
+
+    public func checkIsolated() {
+        dispatchPrecondition(condition: .onQueue(self.queue))
+    }
+
+}
+
 /// An actor that manages the capture pipeline, which includes the capture session, device inputs, and capture outputs.
 /// The app defines it as an `actor` type to ensure that all camera operations happen off of the `@MainActor`.
-actor CaptureService {
+@CaptureServiceActor
+final class CaptureService {
+
+    nonisolated static let sessionQueue: DispatchQueue = DispatchQueue(label: "com.example.apple-samplecode.AVCam.sessionQueue")
 
     /// A value that indicates whether the capture service is idle or capturing a photo or movie.
     @Published private(set) var captureActivity: CaptureActivity = .idle
@@ -25,10 +64,10 @@ actor CaptureService {
     @Published var isShowingFullscreenControls = false
 
     /// A type that connects a preview destination with the capture session.
-    nonisolated let previewSource: PreviewSource
+    let previewSource: PreviewSource
 
     // The app's capture session.
-    private let captureSession = AVCaptureSession()
+    private let captureSession: AVCaptureSession
 
     // An object that manages the app's photo capture behavior.
     private let photoCapture = PhotoCapture()
@@ -64,20 +103,12 @@ actor CaptureService {
     // A map that stores capture controls by device identifier.
     private var controlsMap: [String: [Any]] = [:]
 
-    private let sessionQueue = DispatchQueue(label: "com.example.apple-samplecode.AVCam.sessionQueue")
-
-    // Note: Custom actor executors via DispatchQueue.asUnownedSerialExecutor() are unavailable in this SDK/toolchain.
-    // The actor will use its default executor. If specific work must occur on a particular queue, dispatch to
-    // `sessionQueue` within those methods instead.
-    // If you target an SDK where DispatchQueue exposes `asUnownedSerialExecutor()`, you can restore the property below:
-    //
-    // nonisolated var unownedExecutor: UnownedSerialExecutor {
-    //     sessionQueue.asUnownedSerialExecutor()
-    // }
-
+    @MainActor
     init() {
         // Create a source object to connect the preview view with the capture session.
-        previewSource = DefaultPreviewSource(session: captureSession)
+        let session = AVCaptureSession()
+        captureSession = session
+        previewSource = DefaultPreviewSource(session: session)
     }
 
     // MARK: - Authorization
@@ -140,11 +171,11 @@ actor CaptureService {
             // Configure the session preset based on the current capture mode.
             captureSession.sessionPreset = captureMode == .photo ? .photo : .high
             // Add the photo capture output as the default output type.
-            try addOutput(photoCapture.output)
+            try addOutput(photoCapture.avCaptureOutput)
             // If the capture mode is set to Video, add a movie capture output.
             if captureMode == .video {
                 // Add the movie output as the default output type.
-                try addOutput(movieCapture.output)
+                try addOutput(movieCapture.avCaptureOutput)
                 setHDRVideoEnabled(isHDRVideoEnabled)
             }
 
@@ -220,7 +251,7 @@ actor CaptureService {
         }
 
         // Set the controls delegate.
-        captureSession.setControlsDelegate(controlsDelegate, queue: sessionQueue)
+        captureSession.setControlsDelegate(controlsDelegate, queue: CaptureService.sessionQueue)
 
         // Commit the capture session configuration.
         captureSession.commitConfiguration()
@@ -241,7 +272,7 @@ actor CaptureService {
             // Create a slider to adjust the value from 0 to 1.
             let lensSlider = AVCaptureSlider("Lens Position", symbolName: "circle.dotted.circle", in: 0...1)
             // Perform the slider's action on the session queue.
-            lensSlider.setActionQueue(sessionQueue) { lensPosition in
+            lensSlider.setActionQueue(CaptureService.sessionQueue) { lensPosition in
                 do {
                     try device.lockForConfiguration()
                     device.setFocusModeLocked(lensPosition: lensPosition)
@@ -277,10 +308,10 @@ actor CaptureService {
         case .photo:
             // The app needs to remove the movie capture output to perform Live Photo capture.
             captureSession.sessionPreset = .photo
-            captureSession.removeOutput(movieCapture.output)
+            captureSession.removeOutput(movieCapture.avCaptureOutput)
         case .video:
             captureSession.sessionPreset = .high
-            try addOutput(movieCapture.output)
+            try addOutput(movieCapture.avCaptureOutput)
             if isHDRVideoEnabled {
                 setHDRVideoEnabled(true)
             }
@@ -481,8 +512,7 @@ actor CaptureService {
 
     // MARK: - Photo capture
     func capturePhoto(with features: PhotoFeatures) async throws -> Photo {
-        fatalError("// TODO: implement")
-//        try await photoCapture.capturePhoto(with: features)
+        return try await photoCapture.capturePhoto(with: features)
     }
 
     // MARK: - Movie capture
