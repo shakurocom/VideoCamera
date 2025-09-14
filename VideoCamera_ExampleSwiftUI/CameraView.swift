@@ -9,7 +9,7 @@ struct CameraView<CameraModel: Camera>: PlatformView {
     @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
 
-    @State var camera: CameraModel
+    @StateObject var camera: CameraModel
 
     // The direction a person swipes on the camera preview or mode selector.
     @State var swipeDirection = SwipeDirection.left

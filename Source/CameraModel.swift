@@ -51,7 +51,7 @@ public final class CameraModel: ObservableObject, Camera {
     private let captureService = CaptureService()
 
     /// Persistent state shared between the app and capture extension.
-    private var cameraState = CameraState()
+    @Published private var cameraState = CameraState()
 
     public init() {
         //
@@ -198,33 +198,33 @@ public final class CameraModel: ObservableObject, Camera {
 
         Task {
             // Await new capture activity values from the capture service.
-//            for await activity in await captureService.$captureActivity.values {
-//                if activity.willCapture {
-//                    // Flash the screen to indicate capture is starting.
-//                    flashScreen()
-//                } else {
-//                    // Forward the activity to the UI.
-//                    captureActivity = activity
-//                }
-//            }
+            for await activity in await captureService.$captureActivity.values {
+                if activity.willCapture {
+                    // Flash the screen to indicate capture is starting.
+                    flashScreen()
+                } else {
+                    // Forward the activity to the UI.
+                    captureActivity = activity
+                }
+            }
         }
 
         Task {
             // Await updates to the capabilities that the capture service advertises.
-//            for await capabilities in await captureService.$captureCapabilities.values {
-//                isHDRVideoSupported = capabilities.isHDRSupported
-//                cameraState.isVideoHDRSupported = capabilities.isHDRSupported
-//            }
+            for await capabilities in await captureService.$captureCapabilities.values {
+                isHDRVideoSupported = capabilities.isHDRSupported
+                cameraState.isVideoHDRSupported = capabilities.isHDRSupported
+            }
         }
 
         Task {
             // Await updates to a person's interaction with the Camera Control HUD.
-//            for await isShowingFullscreenControls in await captureService.$isShowingFullscreenControls.values {
-//                withAnimation {
-//                    // Prefer showing a minimized UI when capture controls enter a fullscreen appearance.
-//                    prefersMinimizedUI = isShowingFullscreenControls
-//                }
-//            }
+            for await isShowingFullscreenControls in await captureService.$isShowingFullscreenControls.values {
+                withAnimation {
+                    // Prefer showing a minimized UI when capture controls enter a fullscreen appearance.
+                    prefersMinimizedUI = isShowingFullscreenControls
+                }
+            }
         }
     }
 }

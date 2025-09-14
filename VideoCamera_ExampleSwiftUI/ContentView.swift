@@ -3,7 +3,7 @@ import VideoCamera_Framework
 
 struct ContentView: View {
 
-    @State private var camera = CameraModel()
+    @StateObject private var camera = CameraModel()
 
     var body: some View {
         CameraView(camera: camera)

@@ -50,6 +50,10 @@ private final class DispatchQueueExecutor: SerialExecutor {
 @CaptureServiceActor
 final class CaptureService {
 
+    private struct CaptureSessionContainer: Sendable {
+        let captureSession: AVCaptureSession
+    }
+
     nonisolated static let sessionQueue: DispatchQueue = DispatchQueue(label: "com.example.apple-samplecode.AVCam.sessionQueue")
 
     /// A value that indicates whether the capture service is idle or capturing a photo or movie.
@@ -67,13 +71,13 @@ final class CaptureService {
     let previewSource: PreviewSource
 
     // The app's capture session.
-    private let captureSession: AVCaptureSession
+    private let captureSessionContainer: CaptureSessionContainer
 
     // An object that manages the app's photo capture behavior.
-    private let photoCapture = PhotoCapture()
+    private let photoCapture: PhotoCapture
 
     // An object that manages the app's video capture behavior.
-    private let movieCapture = MovieCapture()
+    private let movieCapture: MovieCapture
 
     // An internal collection of output services.
     private var outputServices: [any OutputService] { [photoCapture, movieCapture] }
@@ -107,8 +111,14 @@ final class CaptureService {
     init() {
         // Create a source object to connect the preview view with the capture session.
         let session = AVCaptureSession()
-        captureSession = session
+        captureSessionContainer = CaptureSessionContainer(captureSession: session)
         previewSource = DefaultPreviewSource(session: session)
+        photoCapture = PhotoCapture()
+        movieCapture = MovieCapture()
+    }
+
+    private var captureSession: AVCaptureSession {
+        return captureSessionContainer.captureSession
     }
 
     // MARK: - Authorization
@@ -431,14 +441,16 @@ final class CaptureService {
     //        )
     //    }
 
+    @available(iOS 17.0, *)
     private func updatePreviewRotation(_ angle: CGFloat) {
-//        let connection = videoPreviewLayer.connection
-//        Task { @MainActor in
+        let connection = videoPreviewLayer.connection
+        Task { @MainActor in
             // Set initial rotation angle on the video preview.
-            //            connection?.videoRotationAngle = angle
-//        }
+            connection?.videoRotationAngle = angle
+        }
     }
 
+    @available(iOS 17.0, *)
     private func updateCaptureRotation(_ angle: CGFloat) {
         // Update the orientation for all output services.
         outputServices.forEach { $0.setVideoRotationAngle(angle) }
@@ -524,8 +536,7 @@ final class CaptureService {
 
     /// Stops the recording and returns the captured movie.
     func stopRecording() async throws -> Movie {
-        fatalError("// TODO: implement")
-//        try await movieCapture.stopRecording()
+        try await movieCapture.stopRecording()
     }
 
     /// Sets whether the app captures HDR video.

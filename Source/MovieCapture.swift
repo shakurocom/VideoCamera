@@ -31,6 +31,9 @@ final class MovieCapture: OutputService {
     // active format supports HDR.
     private var isHDRSupported = false
 
+    @MainActor
+    init() { }
+
     // MARK: - Capturing a movie
 
     /// Starts movie recording.

@@ -5,7 +5,7 @@ import VideoCamera_Framework
 /// A view that presents the main camera user interface.
 struct CameraUI<CameraModel: Camera>: PlatformView {
 
-    @State var camera: CameraModel
+    @StateObject var camera: CameraModel
     @Binding var swipeDirection: SwipeDirection
     
     @Environment(\.verticalSizeClass) var verticalSizeClass

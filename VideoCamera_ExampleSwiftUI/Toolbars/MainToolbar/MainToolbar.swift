@@ -8,7 +8,7 @@ struct MainToolbar<CameraModel: Camera>: PlatformView {
     @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     
-    @State var camera: CameraModel
+    @StateObject var camera: CameraModel
     
     var body: some View {
         HStack {

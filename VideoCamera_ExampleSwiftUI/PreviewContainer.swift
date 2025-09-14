@@ -16,8 +16,8 @@ struct PreviewContainer<Content: View, CameraModel: Camera>: View {
     
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     
-    @State var camera: CameraModel
-    
+    @StateObject var camera: CameraModel
+
     // State values for transition effects.
     @State private var blurRadius = CGFloat.zero
     
@@ -27,7 +27,7 @@ struct PreviewContainer<Content: View, CameraModel: Camera>: View {
     private let content: Content
     
     init(camera: CameraModel, @ViewBuilder content: () -> Content) {
-        self.camera = camera
+        self._camera = StateObject(wrappedValue: camera)
         self.content = content()
     }
     

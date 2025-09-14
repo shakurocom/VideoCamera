@@ -7,7 +7,7 @@ import VideoCamera_Framework
 /// Tapping the view opens the Photos picker.
 struct ThumbnailButton<CameraModel: Camera>: View {
     
-	@State var camera: CameraModel
+	@StateObject var camera: CameraModel
     
     @State private var selectedItems: [PhotosPickerItem] = []
 	

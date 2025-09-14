@@ -24,6 +24,9 @@ final class PhotoCapture: OutputService {
     // A count of Live Photo captures currently in progress.
     private var livePhotoCount = 0
 
+    @MainActor
+    init() { }
+
     // MARK: - Capture a photo.
 
     /// The app calls this method when the user taps the photo capture button.
@@ -81,12 +84,11 @@ final class PhotoCapture: OutputService {
     /// The `PhotoCaptureDelegate` produces an asynchronous stream of values that indicate its current activity.
     /// The app propagates the activity values up to the view tier so the UI can update accordingly.
     private func monitorProgress(of delegate: PhotoCaptureDelegate, isolation: isolated (any Actor)? = #isolation) {
-        let activityStream = delegate.activityStream
         Task { @CaptureServiceActor in
             _ = isolation
             var isLivePhoto = false
             // Asynchronously monitor the activity of the delegate while the system performs capture.
-            for await activity in activityStream {
+            for await activity in delegate.activityStream {
                 var currentActivity = activity
                 /// More than one activity value for the delegate may report that `isLivePhoto` is `true`.
                 /// Only increment/decrement the count when the value changes from its previous state.
@@ -173,22 +175,28 @@ private class PhotoCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate {
         activityContinuation.yield(.photoCapture(isLivePhoto: false))
     }
 
-    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingLivePhotoToMovieFileAt outputFileURL: URL, duration: CMTime, photoDisplayTime: CMTime, resolvedSettings: AVCaptureResolvedPhotoSettings, error: Error?) {
+    func photoOutput(_ output: AVCapturePhotoOutput,
+                     didFinishProcessingLivePhotoToMovieFileAt outputFileURL: URL,
+                     duration: CMTime,
+                     photoDisplayTime: CMTime,
+                     resolvedSettings: AVCaptureResolvedPhotoSettings,
+                     error: Error?) {
         if let error {
             logger.debug("Error processing Live Photo companion movie: \(String(describing: error))")
         }
         livePhotoMovieURL = outputFileURL
     }
 
-    //    func photoOutput(_ output: AVCapturePhotoOutput, didFinishCapturingDeferredPhotoProxy deferredPhotoProxy: AVCaptureDeferredPhotoProxy?, error: Error?) {
-    //        if let error = error {
-    //            logger.debug("Error capturing deferred photo: \(error)")
-    //            return
-    //        }
-    //        // Capture the data for this photo.
-    //        photoData = deferredPhotoProxy?.fileDataRepresentation()
-    //        isProxyPhoto = true
-    //    }
+    @available(iOS 17.0, *)
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishCapturingDeferredPhotoProxy deferredPhotoProxy: AVCaptureDeferredPhotoProxy?, error: Error?) {
+        if let error = error {
+            logger.debug("Error capturing deferred photo: \(error)")
+            return
+        }
+        // Capture the data for this photo.
+        photoData = deferredPhotoProxy?.fileDataRepresentation()
+        isProxyPhoto = true
+    }
 
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error = error {

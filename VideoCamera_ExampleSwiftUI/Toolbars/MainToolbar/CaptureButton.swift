@@ -5,7 +5,7 @@ import VideoCamera_Framework
 @MainActor
 struct CaptureButton<CameraModel: Camera>: View {
     
-    @State var camera: CameraModel
+    @StateObject var camera: CameraModel
     @State var isRecording = false
     
     private let mainButtonDimension: CGFloat = 68

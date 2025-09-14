@@ -34,8 +34,7 @@ class SystemPreferredCameraObserver: NSObject {
         case systemPreferredKeyPath:
             // Update the observer's system-preferred camera value.
             let newDevice = change?[.newKey] as? AVCaptureDevice
-            print("newDevice is \(String(describing: newDevice))")
-//            continuation?.yield(newDevice) // TODO: implement
+            continuation?.yield(newDevice)
         default:
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }

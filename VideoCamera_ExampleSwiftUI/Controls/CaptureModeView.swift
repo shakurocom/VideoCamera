@@ -4,11 +4,11 @@ import VideoCamera_Framework
 /// A view that toggles the camera's capture mode.
 struct CaptureModeView<CameraModel: Camera>: View {
     
-    @State var camera: CameraModel
+    @StateObject var camera: CameraModel
     @Binding private var direction: SwipeDirection
     
     init(camera: CameraModel, direction: Binding<SwipeDirection>) {
-        self.camera = camera
+        self._camera = StateObject(wrappedValue: camera)
         _direction = direction
     }
     
