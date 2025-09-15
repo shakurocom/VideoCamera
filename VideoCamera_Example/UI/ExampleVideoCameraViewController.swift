@@ -16,7 +16,7 @@ class ExampleVideoCameraViewController: UIViewController {
 
     private var cameraModel: CameraModel = CameraModel()
 
-    private var isNewCameraShown: Bool = true
+    private var isNewCameraShown: Bool = false
 
     // MARK: - Initialization
 
