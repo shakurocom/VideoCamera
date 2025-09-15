@@ -195,8 +195,9 @@ internal final class DeviceCamera: NSObject, @unchecked Sendable {
                 }
                 useDeviceOrientationListener = configuration.usePreciseOrientationDetectionMethod
                 if useDeviceOrientationListener {
-                    deviceOrientationListener = DeviceOrientationListener()
-                    deviceOrientationListener?.beginListeningDeviceOrientation()
+                    // TODO: implement
+//                    deviceOrientationListener = DeviceOrientationListener()
+//                    deviceOrientationListener?.beginListeningDeviceOrientation()
                 }
             }
 

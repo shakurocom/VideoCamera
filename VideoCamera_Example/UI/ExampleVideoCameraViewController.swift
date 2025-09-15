@@ -16,7 +16,7 @@ class ExampleVideoCameraViewController: UIViewController {
 
     private var cameraModel: CameraModel = CameraModel()
 
-    private var isNewCameraShown: Bool = false
+    private var isNewCameraShown: Bool = true
 
     // MARK: - Initialization
 
@@ -69,7 +69,7 @@ class ExampleVideoCameraViewController: UIViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         if isNewCameraShown {
-
+            // TODO: implement
         } else {
             camera?.stopSession()
         }
@@ -79,7 +79,7 @@ class ExampleVideoCameraViewController: UIViewController {
 
     @IBAction private func flashButtonTapped() {
         if isNewCameraShown {
-
+            // TODO: implement
         } else {
             camera?.setNextFlashMode()
         }
@@ -87,7 +87,7 @@ class ExampleVideoCameraViewController: UIViewController {
 
     @IBAction private func torchButtonTapped() {
         if isNewCameraShown {
-
+            // TODO: implement
         } else {
             camera?.selectNextTorchMode()
         }
@@ -96,7 +96,7 @@ class ExampleVideoCameraViewController: UIViewController {
     @IBAction private func takePhotoButtonTapped() {
         takePhotoButton.isEnabled = false
         if isNewCameraShown {
-
+            // TODO: implement
         } else {
             camera?.capturePhoto(completionBlock: { (imageData: Data?, error: Error?) in
                 DispatchQueue.main.async(execute: {
@@ -120,7 +120,7 @@ class ExampleVideoCameraViewController: UIViewController {
 
     private func updateFlashButton() {
         if isNewCameraShown {
-
+            // TODO: implement
         } else {
             if let flashMode = camera?.flashMode {
                 let newTitle: String
@@ -141,7 +141,7 @@ class ExampleVideoCameraViewController: UIViewController {
 
     private func updateTorchButton() {
         if isNewCameraShown {
-
+            // TODO: implement
         } else {
             if let torchMode = camera?.torchMode {
                 let newTitle: String

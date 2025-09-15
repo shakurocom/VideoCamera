@@ -1,7 +1,7 @@
 import os.log
 import SwiftUI
 
-let logger = Logger()
+let logger = Logger() // TODO: implement
 
 /// An object that provides the interface to the features of the camera.
 ///
@@ -13,6 +13,10 @@ let logger = Logger()
 ///
 @MainActor
 public final class CameraModel: ObservableObject, Camera {
+
+    public struct Options {
+
+    }
 
     /// The current status of the camera, such as unauthorized, running, or failed.
     @Published public private(set) var status = CameraStatus.unknown
@@ -44,17 +48,20 @@ public final class CameraModel: ObservableObject, Camera {
     /// A Boolean that indicates whether the camera supports HDR video recording.
     @Published public private(set) var isHDRVideoSupported = false
 
-    /// An object that saves captured media to a person's Photos library.
-    private let mediaLibrary = MediaLibrary()
-
     /// An object that manages the app's capture functionality.
-    private let captureService = CaptureService()
+    private let captureService: CaptureService
 
     /// Persistent state shared between the app and capture extension.
     @Published private var cameraState = CameraState()
 
-    public init() {
-        //
+    /// saves captured media to a person's Photos library.
+    private let mediaLibrary = MediaLibrary()
+
+    private let options: Options
+
+    public init(options: Options) {
+        self.options = options
+        self.captureService = CaptureService(options: CaptureService.Options(isAudioAvailable: false))
     }
 
     // MARK: - Starting the camera
@@ -82,7 +89,7 @@ public final class CameraModel: ObservableObject, Camera {
     ///
     /// `CameraState` represents the persistent state, such as the capture mode, that the app and extension share.
     public func syncState() async {
-        //        cameraState = await CameraState.current
+        //        cameraState = await CameraState.current // TODO: implement
         captureMode = cameraState.captureMode
         qualityPrioritization = cameraState.qualityPrioritization
         isLivePhotoEnabled = cameraState.isLivePhotoEnabled
