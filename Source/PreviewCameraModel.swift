@@ -3,23 +3,13 @@ import SwiftUI
 
 public class PreviewCameraModel: ObservableObject, Camera {
 
-    @Published public var isLivePhotoEnabled = true
-    @Published public var prefersMinimizedUI = false
-    @Published public var qualityPrioritization = QualityPrioritization.quality
-    @Published public var shouldFlashScreen = false
-    @Published public var isHDRVideoSupported = false
-    @Published public var isHDRVideoEnabled = false
-
-    struct PreviewSourceStub: PreviewSource {
-        // Stubbed out for test purposes.
+    struct PreviewSourceStub: PreviewSource { // stubbed out for test purposes
         func connect(to target: PreviewTarget) {}
     }
-    
-    public let previewSource: PreviewSource = PreviewSourceStub()
 
     @Published public private(set) var status = CameraStatus.unknown
-    @Published public private(set) var captureActivity = CaptureActivity.idle
-    @Published public var captureMode = CaptureMode.photo {
+
+    @Published public var captureMode = CaptureMode.photo { // photo video
         didSet {
             isSwitchingModes = true
             Task {
@@ -29,54 +19,50 @@ public class PreviewCameraModel: ObservableObject, Camera {
             }
         }
     }
-    @Published public private(set) var isSwitchingModes = false
-    @Published public private(set) var isVideoDeviceSwitchable = true
-    @Published public private(set) var isSwitchingVideoDevices = false
-    @Published public private(set) var thumbnail: CGImage?
 
-    @Published public var error: Error?
+    @Published public private(set) var isSwitchingModes = false // camera is currently switching capture modes
+    @Published public private(set) var captureActivity = CaptureActivity.idle // photo capture, movie capture, or idle
+    @Published public private(set) var isSwitchingVideoDevices = false
+    @Published public var prefersMinimizedControlsUI = false
+    @Published public var isLivePhotoEnabled = true
+    @Published public var isHDRVideoSupported = false // indicates whether the camera supports HDR video recording
+    @Published public var isHDRVideoEnabled = false // indicates whether camera enables HDR video recording
+    // value indicates how to balance the photo capture quality versus speed
+    @Published public var qualityPrioritization = QualityPrioritization.quality
+    @Published public var shouldFlashScreen = false // indicates whether to show visual feedback when capture begins
+    public let previewSource: PreviewSource = PreviewSourceStub()
+    @Published public private(set) var thumbnail: CGImage? // thumbnail image for the most recent photo or video capture.
+    @Published public var error: Error? // error if the camera encountered a problem
+
+    // MARK: - Initialization
 
     public init(captureMode: CaptureMode = .photo, status: CameraStatus = .unknown) {
         self.captureMode = captureMode
         self.status = status
     }
-    
+
+    // MARK: - Public
+
     public func start() async {
         if status == .unknown {
             status = .running
         }
     }
-    
-    public func switchVideoDevices() {
+
+    public func switchVideoDevices() async {
         logger.debug("Device switching isn't implemented in PreviewCamera.")
     }
-    
-    public func capturePhoto() {
-        logger.debug("Photo capture isn't implemented in PreviewCamera.")
-    }
-    
-    public func toggleRecording() {
-        logger.debug("Moving capture isn't implemented in PreviewCamera.")
-    }
-    
-    public func focusAndExpose(at point: CGPoint) {
+
+    public func focusAndExpose(at point: CGPoint) async { // func performs a one-time automatic focus and exposure operation
         logger.debug("Focus and expose isn't implemented in PreviewCamera.")
     }
-    
-    public var recordingTime: TimeInterval { .zero }
 
-    private func capabilities(for mode: CaptureMode) -> CaptureCapabilities {
-        switch mode {
-        case .photo:
-            return CaptureCapabilities(isLivePhotoCaptureSupported: true)
-        case .video:
-            return CaptureCapabilities(isLivePhotoCaptureSupported: false,
-                                       isHDRSupported: true)
-        }
+    public func capturePhoto() async { // captures a photo and writes it to the user's photo library
+        logger.debug("Photo capture isn't implemented in PreviewCamera.")
     }
-    
-    public func syncState() async {
-        logger.debug("Syncing state isn't implemented in PreviewCamera.")
+
+    public func toggleRecording() async { // starts or stops recording a movie, and writes it to the user's photo library when complete
+        logger.debug("Moving capture isn't implemented in PreviewCamera.")
     }
 
 }

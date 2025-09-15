@@ -33,7 +33,7 @@ struct CaptureModeView<CameraModel: Camera>: View {
             camera.captureMode = modes[newIndex]
         }
         // Hide the capture mode view when a person interacts with capture controls.
-        .opacity(camera.prefersMinimizedUI ? 0 : 1)
+        .opacity(camera.prefersMinimizedControlsUI ? 0 : 1)
     }
 }
 

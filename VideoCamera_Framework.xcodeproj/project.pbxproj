@@ -127,16 +127,16 @@
 		17AC9F5828AA771F00DF8A2B /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				B8A704A42E7048CA0028A33E /* Camera.swift */,
+				B8A704AA2E704A790028A33E /* CameraModel.swift */,
 				A5E593412E72DFBA000C3DE5 /* PreviewCameraModel.swift */,
 				A56546802E77E67700131AAF /* test_image.jpg */,
-				B8A704AA2E704A790028A33E /* CameraModel.swift */,
 				B8A704B02E704CAD0028A33E /* CaptureService.swift */,
 				A565498A2E70A813000E28C3 /* CameraState.swift */,
 				B8A704B22E705F420028A33E /* MovieCapture.swift */,
 				B8A704B32E705F420028A33E /* PhotoCapture.swift */,
 				B8A704B62E705F550028A33E /* DeviceLookup.swift */,
 				B8A704B72E705F550028A33E /* SystemPreferredCameraObserver.swift */,
-				B8A704A42E7048CA0028A33E /* Camera.swift */,
 				B8A704A62E7049130028A33E /* DataTypes.swift */,
 				B8A704AE2E704C620028A33E /* MediaLibrary.swift */,
 				B8A704BA2E705F870028A33E /* CaptureExtensions.swift */,

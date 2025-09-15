@@ -3,103 +3,22 @@ import SwiftUI
 
 let logger = Logger() // TODO: implement
 
-/// An object that provides the interface to the features of the camera.
-///
-/// This object provides the default implementation of the `Camera` protocol, which defines the interface
-/// to configure the camera hardware and capture media. `CameraModel` doesn't perform capture itself, but is an
-/// `@Observable` type that mediates interactions between the app's SwiftUI views and `CaptureService`.
-///
-/// For SwiftUI previews and Simulator, the app uses `PreviewCameraModel` instead.
-///
 @MainActor
 public final class CameraModel: ObservableObject, Camera {
 
     public struct Options {
 
+        public let isAudioAvailable: Bool
+
+        public init(isAudioAvailable: Bool) {
+            self.isAudioAvailable = isAudioAvailable
+        }
+
     }
 
-    /// The current status of the camera, such as unauthorized, running, or failed.
     @Published public private(set) var status = CameraStatus.unknown
 
-    /// The current state of photo or movie capture.
-    @Published public private(set) var captureActivity = CaptureActivity.idle
-
-    /// A Boolean value that indicates whether the app is currently switching video devices.
-    @Published public private(set) var isSwitchingVideoDevices = false
-
-    /// A Boolean value that indicates whether the camera prefers showing a minimized set of UI controls.
-    @Published public private(set) var prefersMinimizedUI = false
-
-    /// A Boolean value that indicates whether the app is currently switching capture modes.
-    @Published public private(set) var isSwitchingModes = false
-
-    /// A Boolean value that indicates whether to show visual feedback when capture begins.
-    @Published public private(set) var shouldFlashScreen = false
-
-    /// A thumbnail for the last captured photo or video.
-    @Published public private(set) var thumbnail: CGImage?
-
-    /// An error that indicates the details of an error during photo or movie capture.
-    @Published public private(set) var error: Error?
-
-    /// An object that provides the connection between the capture session and the video preview layer.
-    public var previewSource: PreviewSource { captureService.previewSource }
-
-    /// A Boolean that indicates whether the camera supports HDR video recording.
-    @Published public private(set) var isHDRVideoSupported = false
-
-    /// An object that manages the app's capture functionality.
-    private let captureService: CaptureService
-
-    /// Persistent state shared between the app and capture extension.
-    @Published private var cameraState = CameraState()
-
-    /// saves captured media to a person's Photos library.
-    private let mediaLibrary = MediaLibrary()
-
-    private let options: Options
-
-    public init(options: Options) {
-        self.options = options
-        self.captureService = CaptureService(options: CaptureService.Options(isAudioAvailable: false))
-    }
-
-    // MARK: - Starting the camera
-    /// Start the camera and begin the stream of data.
-    public func start() async {
-        // Verify that the person authorizes the app to use device cameras and microphones.
-        guard await captureService.isAuthorized else {
-            status = .unauthorized
-            return
-        }
-        do {
-            // Synchronize the state of the model with the persistent state.
-            await syncState()
-            // Start the capture service to start the flow of data.
-            try await captureService.start(with: cameraState)
-            observeState()
-            status = .running
-        } catch {
-            logger.error("Failed to start capture service. \(error)")
-            status = .failed
-        }
-    }
-
-    /// Synchronizes the persistent camera state.
-    ///
-    /// `CameraState` represents the persistent state, such as the capture mode, that the app and extension share.
-    public func syncState() async {
-        //        cameraState = await CameraState.current // TODO: implement
-        captureMode = cameraState.captureMode
-        qualityPrioritization = cameraState.qualityPrioritization
-        isLivePhotoEnabled = cameraState.isLivePhotoEnabled
-        isHDRVideoEnabled = cameraState.isVideoHDREnabled
-    }
-
-    // MARK: - Changing modes and devices
-
-    /// A value that indicates the mode of capture for the camera.
-    public var captureMode = CaptureMode.photo {
+    public var captureMode = CaptureMode.photo { // photo video
         didSet {
             guard status == .running else { return }
             Task {
@@ -113,27 +32,11 @@ public final class CameraModel: ObservableObject, Camera {
         }
     }
 
-    /// Selects the next available video device for capture.
-    public func switchVideoDevices() async {
-        isSwitchingVideoDevices = true
-        defer { isSwitchingVideoDevices = false }
-        await captureService.selectNextVideoDevice()
-    }
+    @Published public private(set) var isSwitchingModes = false // camera is currently switching capture modes
+    @Published public private(set) var captureActivity = CaptureActivity.idle // photo capture, movie capture, or idle
+    @Published public private(set) var isSwitchingVideoDevices = false
+    @Published public private(set) var prefersMinimizedControlsUI = false
 
-    // MARK: - Photo capture
-
-    /// Captures a photo and writes it to the user's Photos library.
-    public func capturePhoto() async {
-        do {
-            let photoFeatures = PhotoFeatures(isLivePhotoEnabled: isLivePhotoEnabled, qualityPrioritization: qualityPrioritization)
-            let photo = try await captureService.capturePhoto(with: photoFeatures)
-            try await mediaLibrary.save(photo: photo)
-        } catch {
-            self.error = error
-        }
-    }
-
-    /// A Boolean value that indicates whether to capture Live Photos when capturing stills.
     public var isLivePhotoEnabled = true {
         didSet {
             // Update the persistent state value.
@@ -141,30 +44,9 @@ public final class CameraModel: ObservableObject, Camera {
         }
     }
 
-    /// A value that indicates how to balance the photo capture quality versus speed.
-    public var qualityPrioritization = QualityPrioritization.quality {
-        didSet {
-            // Update the persistent state value.
-            cameraState.qualityPrioritization = qualityPrioritization
-        }
-    }
+    @Published public private(set) var isHDRVideoSupported = false // indicates whether the camera supports HDR video recording
 
-    /// Performs a focus and expose operation at the specified screen point.
-    public func focusAndExpose(at point: CGPoint) async {
-        await captureService.focusAndExpose(at: point)
-    }
-
-    /// Sets the `showCaptureFeedback` state to indicate that capture is underway.
-    private func flashScreen() {
-        shouldFlashScreen = true
-        withAnimation(.linear(duration: 0.01)) {
-            shouldFlashScreen = false
-        }
-    }
-
-    // MARK: - Video capture
-    /// A Boolean value that indicates whether the camera captures video in HDR format.
-    public var isHDRVideoEnabled = false {
+    public var isHDRVideoEnabled = false { // indicates whether camera enables HDR video recording
         didSet {
             guard status == .running, captureMode == .video else { return }
             Task {
@@ -175,63 +57,140 @@ public final class CameraModel: ObservableObject, Camera {
         }
     }
 
-    /// Toggles the state of recording.
-    public func toggleRecording() async {
+    // value indicates how to balance the photo capture quality versus speed
+    @Published public var qualityPrioritization = QualityPrioritization.quality {
+        didSet {
+            // Update the persistent state value.
+            cameraState.qualityPrioritization = qualityPrioritization
+        }
+    }
+
+    @Published public private(set) var shouldFlashScreen = false // indicates whether to show visual feedback when capture begins
+    public var previewSource: PreviewSource { captureService.previewSource }
+    @Published public private(set) var thumbnail: CGImage? // thumbnail image for the most recent photo or video capture
+    @Published public private(set) var error: Error? // error if the camera encountered a problem
+
+    private let options: Options
+    private let captureService: CaptureService
+    private let mediaLibrary = MediaLibrary() // TODO: implement - optional?
+
+    @Published private var cameraState = CameraState() // TODO: implement - CameraState
+
+    // MARK: - Initialization
+
+    public init(options: Options) {
+        self.options = options
+        self.captureService = CaptureService(options: CaptureService.Options(isAudioAvailable: options.isAudioAvailable))
+    }
+
+    // MARK: - Public
+
+    public func start() async {
+        guard await captureService.isAuthorized else { // TODO: implement
+            status = .unauthorized
+            return
+        }
+        do {
+            try await captureService.start(with: cameraState)
+            startObserving()
+            status = .running
+        } catch {
+            logger.error("Failed to start capture service. \(error)")
+            status = .failed
+        }
+    }
+
+    public func switchVideoDevices() async {
+        isSwitchingVideoDevices = true
+        defer { isSwitchingVideoDevices = false }
+        await captureService.selectNextVideoDevice()
+    }
+
+    public func focusAndExpose(at point: CGPoint) async { // func performs a one-time automatic focus and exposure operation
+        await captureService.focusAndExpose(at: point)
+    }
+
+    public func capturePhoto() async { // captures a photo and writes it to the user's photo library
+        do {
+            let photoFeatures = PhotoFeatures(isLivePhotoEnabled: isLivePhotoEnabled, qualityPrioritization: qualityPrioritization)
+            let photo = try await captureService.capturePhoto(with: photoFeatures)
+            try await mediaLibrary.save(photo: photo)
+        } catch {
+            self.error = error
+        }
+    }
+
+    public func toggleRecording() async { // starts or stops recording a movie, and writes it to the user's photo library when complete
         switch await captureService.captureActivity {
         case .movieCapture:
             do {
-                // If currently recording, stop the recording and write the movie to the library.
                 let movie = try await captureService.stopRecording()
                 try await mediaLibrary.save(movie: movie)
             } catch {
                 self.error = error
             }
         default:
-            // In any other case, start recording.
             await captureService.startRecording()
         }
     }
 
-    // MARK: - Internal state observations
+    // MARK: - Private
 
-    // Set up camera's state observations.
-    private func observeState() {
-        Task {
-            // Await new thumbnails that the media library generates when saving a file.
-            for await thumbnail in mediaLibrary.thumbnails.compactMap({ $0 }) {
-                self.thumbnail = thumbnail
+    private func startObserving() {
+        Task(operation: { [weak self] in
+            guard let mediaLibraryActual = self?.mediaLibrary else {
+                return
             }
-        }
-
-        Task {
-            // Await new capture activity values from the capture service.
-            for await activity in await captureService.$captureActivity.values {
-                if activity.willCapture {
-                    // Flash the screen to indicate capture is starting.
-                    flashScreen()
-                } else {
-                    // Forward the activity to the UI.
-                    captureActivity = activity
+            // await new thumbnails that the media library generates when saving a file
+            for await thumbnail in mediaLibraryActual.thumbnails {
+                if let thumbnail {
+                    self?.thumbnail = thumbnail
                 }
             }
-        }
-
-        Task {
-            // Await updates to the capabilities that the capture service advertises.
-            for await capabilities in await captureService.$captureCapabilities.values {
-                isHDRVideoSupported = capabilities.isHDRSupported
-                cameraState.isVideoHDRSupported = capabilities.isHDRSupported
+        })
+        Task(operation: { [weak self] in
+            guard let captureServiceActual = self?.captureService else {
+                return
             }
-        }
-
-        Task {
-            // Await updates to a person's interaction with the Camera Control HUD.
-            for await isShowingFullscreenControls in await captureService.$isShowingFullscreenControls.values {
+            // await new capture activity values from the capture service
+            for await activity in await captureServiceActual.$captureActivity.values {
+                if activity.willCapture {
+                    // flash the screen to indicate capture is starting
+                    self?.flashScreen()
+                } else {
+                    self?.captureActivity = activity
+                }
+            }
+        })
+        Task(operation: { [weak self] in
+            guard let captureServiceActual = self?.captureService else {
+                return
+            }
+            // await updates to the capabilities that the capture service advertises
+            for await capabilities in await captureServiceActual.$captureCapabilities.values {
+                self?.isHDRVideoSupported = capabilities.isHDRSupported
+                self?.cameraState.isVideoHDRSupported = capabilities.isHDRSupported
+            }
+        })
+        Task(operation: { [weak self] in
+            guard let captureServiceActual = self?.captureService else {
+                return
+            }
+            // await updates to a person's interaction with the Camera Control HUD
+            for await isShowingFullscreenControls in await captureServiceActual.$isShowingFullscreenControls.values {
                 withAnimation {
                     // Prefer showing a minimized UI when capture controls enter a fullscreen appearance.
-                    prefersMinimizedUI = isShowingFullscreenControls
+                    self?.prefersMinimizedControlsUI = isShowingFullscreenControls
                 }
             }
-        }
+        })
     }
+
+    private func flashScreen() {
+        shouldFlashScreen = true
+        withAnimation(.linear(duration: 0.01), {
+            shouldFlashScreen = false
+        })
+    }
+
 }

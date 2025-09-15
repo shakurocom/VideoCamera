@@ -25,7 +25,7 @@ struct FeaturesToolbar<CameraModel: Camera>: PlatformView {
         .buttonStyle(DefaultButtonStyle(size: isRegularSize ? .large : .small))
         .padding([.leading, .trailing])
         // Hide the toolbar items when a person interacts with capture controls.
-        .opacity(camera.prefersMinimizedUI ? 0 : 1)
+        .opacity(camera.prefersMinimizedControlsUI ? 0 : 1)
     }
     
     //  A button to toggle the enabled state of Live Photo capture.

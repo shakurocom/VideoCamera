@@ -14,7 +14,7 @@ class ExampleVideoCameraViewController: UIViewController {
 
     private var camera: VideoCamera?
 
-    private var cameraModel: CameraModel = CameraModel()
+    private var cameraModel: CameraModel?
 
     private var isNewCameraShown: Bool = true
 
@@ -26,7 +26,9 @@ class ExampleVideoCameraViewController: UIViewController {
         title = example?.title
 
         if isNewCameraShown {
-            let previewSource = cameraModel.previewSource
+            let model = CameraModel(options: CameraModel.Options(isAudioAvailable: false))
+            cameraModel = model
+            let previewSource = model.previewSource
             let previewView = PreviewView()
             previewSource.connect(to: previewView)
             previewView.translatesAutoresizingMaskIntoConstraints = true
@@ -59,7 +61,7 @@ class ExampleVideoCameraViewController: UIViewController {
         super.viewWillAppear(animated)
         if isNewCameraShown {
             Task(operation: {
-                await cameraModel.start()
+                await cameraModel?.start()
             })
         } else {
             camera?.startSession()
