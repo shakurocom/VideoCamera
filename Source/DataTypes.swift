@@ -106,7 +106,6 @@ struct CaptureCapabilities {
         self.isHDRSupported = isHDRSupported
     }
 
-    static let unknown = CaptureCapabilities()
 }
 
 public enum QualityPrioritization: Int, Identifiable, CaseIterable, CustomStringConvertible, Codable, Sendable {

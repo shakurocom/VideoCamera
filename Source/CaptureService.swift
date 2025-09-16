@@ -56,7 +56,7 @@ final class CaptureService {
     /// A value that indicates whether the capture service is idle or capturing a photo or movie.
     @Published private(set) var captureActivity: CaptureActivity = .idle
     /// A value that indicates the current capture capabilities of the service.
-    @Published private(set) var captureCapabilities = CaptureCapabilities.unknown
+    @Published private(set) var captureCapabilities: CaptureCapabilities?
     /// A Boolean value that indicates whether a higher priority event, like receiving a phone call, interrupts the app.
     @Published private(set) var isInterrupted = false
     /// A Boolean value that indicates whether the user enables HDR video capture.
@@ -501,15 +501,21 @@ final class CaptureService {
     }
 
     func capturePhoto(with features: PhotoFeatures) async throws -> Photo {
-        return try await photoCapture.capturePhoto(with: features)
+        guard let photoCaptureActual = photoCapture else {
+            throw
+        }
+        return try await photoCaptureActual.capturePhoto(with: features)
     }
 
     func startRecording() {
-        movieCapture.startRecording()
+        movieCapture?.startRecording()
     }
 
     func stopRecording() async throws -> Movie {
-        try await movieCapture.stopRecording()
+        guard let movieCaptureActual = movieCapture else {
+            throw
+        }
+        return try await movieCaptureActual.stopRecording()
     }
 
     /// Sets whether the app captures HDR video.
@@ -546,17 +552,20 @@ final class CaptureService {
         // Set the capture service's capabilities for the selected mode.
         switch captureMode {
         case .photo:
-            captureCapabilities = photoCapture.capabilities
+            captureCapabilities = photoCapture?.capabilities
         case .video:
-            captureCapabilities = movieCapture.capabilities
+            captureCapabilities = movieCapture?.capabilities
+        case .none:
+            break
         }
     }
 
     /// Merge the `captureActivity` values of the photo and movie capture services,
     /// and assign the value to the actor's property.`
     private func observeOutputServices() {
-        Publishers.Merge(photoCapture.$captureActivity, movieCapture.$captureActivity)
-            .assign(to: &$captureActivity)
+        // TODO: implement
+//        Publishers.Merge(photoCapture.$captureActivity, movieCapture.$captureActivity)
+//            .assign(to: &$captureActivity)
     }
 
     /// Observe when capture control enter and exit a fullscreen appearance.
