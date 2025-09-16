@@ -179,7 +179,7 @@ public final class CameraModel: ObservableObject, Camera {
             // await updates to a person's interaction with the Camera Control HUD
             for await isShowingFullscreenControls in await captureServiceActual.$isShowingFullscreenControls.values {
                 withAnimation {
-                    // Prefer showing a minimized UI when capture controls enter a fullscreen appearance.
+                    // prefer showing a minimized UI when capture controls enter a fullscreen appearance
                     self?.prefersMinimizedControlsUI = isShowingFullscreenControls
                 }
             }
