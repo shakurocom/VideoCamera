@@ -8,10 +8,13 @@ public final class CameraModel: ObservableObject, Camera {
 
     public struct Options {
 
-        public let isAudioAvailable: Bool
+        public let isAudioAllowed: Bool
+        public let isCaptureAllowed: Bool
 
-        public init(isAudioAvailable: Bool) {
-            self.isAudioAvailable = isAudioAvailable
+        public init(isAudioAllowed: Bool,
+                    isCaptureAllowed: Bool) {
+            self.isAudioAllowed = isAudioAllowed
+            self.isCaptureAllowed = isCaptureAllowed
         }
 
     }
@@ -72,7 +75,7 @@ public final class CameraModel: ObservableObject, Camera {
 
     private let options: Options
     private let captureService: CaptureService
-    private let mediaLibrary = MediaLibrary() // TODO: implement - optional?
+    private let mediaLibrary: MediaLibrary?
 
     @Published private var cameraState = CameraState() // TODO: implement - CameraState
 
@@ -80,7 +83,10 @@ public final class CameraModel: ObservableObject, Camera {
 
     public init(options: Options) {
         self.options = options
-        self.captureService = CaptureService(options: CaptureService.Options(isAudioAvailable: options.isAudioAvailable))
+        self.captureService = CaptureService(options: CaptureService.Options(isAudioAllowed: options.isAudioAllowed))
+        if options.isCaptureAllowed {
+            mediaLibrary = MediaLibrary()
+        }
     }
 
     // MARK: - Public
@@ -111,21 +117,27 @@ public final class CameraModel: ObservableObject, Camera {
     }
 
     public func capturePhoto() async { // captures a photo and writes it to the user's photo library
+        guard let mediaLibraryActual = mediaLibrary else {
+            return
+        }
         do {
             let photoFeatures = PhotoFeatures(isLivePhotoEnabled: isLivePhotoEnabled, qualityPrioritization: qualityPrioritization)
             let photo = try await captureService.capturePhoto(with: photoFeatures)
-            try await mediaLibrary.save(photo: photo)
+            try await mediaLibraryActual.save(photo: photo)
         } catch {
             self.error = error
         }
     }
 
     public func toggleRecording() async { // starts or stops recording a movie, and writes it to the user's photo library when complete
+        guard let mediaLibraryActual = mediaLibrary else {
+            return
+        }
         switch await captureService.captureActivity {
         case .movieCapture:
             do {
                 let movie = try await captureService.stopRecording()
-                try await mediaLibrary.save(movie: movie)
+                try await mediaLibraryActual.save(movie: movie)
             } catch {
                 self.error = error
             }

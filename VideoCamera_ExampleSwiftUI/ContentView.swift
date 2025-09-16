@@ -3,7 +3,7 @@ import VideoCamera_Framework
 
 struct ContentView: View {
 
-    @StateObject private var camera = CameraModel(options: CameraModel.Options(isAudioAvailable: true))
+    @StateObject private var camera = CameraModel(options: CameraModel.Options(isAudioAllowed: true))
 
     var body: some View {
         CameraView(camera: camera)

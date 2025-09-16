@@ -42,7 +42,8 @@ private final class DispatchQueueExecutor: SerialExecutor {
 final class CaptureService {
 
     struct Options {
-        let isAudioAvailable: Bool
+        let isAudioAllowed: Bool
+        let captureModes: [CaptureMode]
     }
 
     private struct CaptureSessionContainer: Sendable {
@@ -67,35 +68,36 @@ final class CaptureService {
 
     private let options: Options
     private let captureSessionContainer: CaptureSessionContainer
-    private let photoCapture: PhotoCapture // TODO: implement - make optional and configurable ?
-    private let movieCapture: MovieCapture // TODO: implement - make optional and configurable ?
-
-    // The video input for the currently selected device camera.
-    private var activeVideoInput: AVCaptureDeviceInput?
-
-    // The mode of capture, either photo or video. Defaults to photo.
-    private(set) var captureMode = CaptureMode.photo
-
-    // An object the service uses to retrieve capture devices.
+    private let photoCapture: PhotoCapture?
+    private let movieCapture: MovieCapture?
     private let deviceLookup = DeviceLookup()
+    private let systemPreferredCamera = SystemPreferredCameraObserver() // monitors the state of the system-preferred camera
 
-    // An object that monitors the state of the system-preferred camera.
-    private let systemPreferredCamera = SystemPreferredCameraObserver()
-
-    // An object that monitors video device rotations.
-    private var rotationCoordinator: NSObject! // AVCaptureDevice.RotationCoordinator
-    private var rotationObservers = [AnyObject]()
-
-    // A Boolean value that indicates whether the actor finished its required configuration.
+    private var activeVideoInput: AVCaptureDeviceInput? // video input for the currently selected device camera
+    private(set) var captureMode: CaptureMode?
     private var isSessionConfigured = false
-
+    private var rotationCoordinator: NSObject! // AVCaptureDevice.RotationCoordinator - monitors video device rotations
+    private var rotationObservers = [AnyObject]()
     private var controlsMap: [String: [Any]] = [:] // device identifier : capture control (AVCaptureControl)
     private var controlsDelegate = CaptureControlsDelegate() // object that responds to capture control activation and presentation events
     private var subjectAreaChangeTask: Task<Void, Never>?
 
     private var outputServices: [any OutputService] {
-        return [photoCapture, movieCapture]
+        var result: [any OutputService]
+        if let photoCaptureActual = photoCapture {
+            result.append(photoCaptureActual)
+        }
+        if let movieCaptureActual = movieCapture {
+            result.append(movieCaptureActual)
+        }
+        return result
     }
+
+    private var captureSession: AVCaptureSession {
+        return captureSessionContainer.captureSession
+    }
+
+    // MARK: - Initialization
 
     @MainActor
     init(options: Options) {
@@ -103,12 +105,13 @@ final class CaptureService {
         let session = AVCaptureSession()
         self.captureSessionContainer = CaptureSessionContainer(captureSession: session)
         self.previewSource = DefaultPreviewSource(session: session)
-        self.photoCapture = PhotoCapture()
-        self.movieCapture = MovieCapture()
-    }
-
-    private var captureSession: AVCaptureSession {
-        return captureSessionContainer.captureSession
+        if options.captureModes.contains(.photo) {
+            self.photoCapture = PhotoCapture()
+        }
+        if options.captureModes.contains(.video) {
+            self.movieCapture = MovieCapture()
+        }
+        self.captureMode = options.captureModes.first
     }
 
     // MARK: - Authorization
@@ -130,7 +133,7 @@ final class CaptureService {
     }
 
     // MARK: - Capture session life cycle
-    func start(with state: CameraState) async throws {
+    func start(with state: CameraState) async throws { // TODO: implement
         captureMode = state.captureMode
         isHDRVideoEnabled = state.isVideoHDREnabled
         guard await isAuthorized, !captureSession.isRunning else {
@@ -158,8 +161,7 @@ final class CaptureService {
                 throw CameraError.videoDeviceUnavailable
             }
             activeVideoInput = try addInput(for: defaultCamera)
-            // audio
-            if options.isAudioAvailable {
+            if options.isAudioAllowed {
                 let defaultMic = try deviceLookup.defaultMic
                 if #available(iOS 26.0, *) {
                     // enable AirPods usage as a high-quality microphone
@@ -167,22 +169,22 @@ final class CaptureService {
                 }
                 try addInput(for: defaultMic)
             }
-
-            // TODO: implement - configurable
-            captureSession.sessionPreset = captureMode == .photo ? .photo : .high // TODO: implement
-            try addOutput(photoCapture.avCaptureOutput)
-
-            // TODO: implement - configurable
-            if captureMode == .video {
-                try addOutput(movieCapture.avCaptureOutput)
-                setHDRVideoEnabled(isHDRVideoEnabled)
+            if photoCapture != nil || movieCapture != nil {
+                captureSession.sessionPreset = captureMode == .photo ? .photo : .high
+                if let photoCaptureActual = photoCapture {
+                    try addOutput(photoCaptureActual.avCaptureOutput)
+                }
+                if let movieCaptureActual = movieCapture, captureMode == .video {
+                    try addOutput(movieCaptureActual.avCaptureOutput)
+                    setHDRVideoEnabled(isHDRVideoEnabled)
+                }
             }
             if #available(iOS 18.0, *) {
-                configureControls(for: defaultCamera)
+                configureControls(for: defaultCamera) // TODO: implement
             }
             monitorSystemPreferredCamera()
             if #available(iOS 17.0, *) {
-                createRotationCoordinator(for: defaultCamera)
+                createRotationCoordinator(for: defaultCamera) // TODO: implement
             } else {
                 // TODO: implement
             }
@@ -327,34 +329,31 @@ final class CaptureService {
         device.unlockForConfiguration()
     }
 
-    // MARK: - Capture mode selection
-
-    /// Changes the mode of capture, which can be `photo` or `video`.
-    ///
-    /// - Parameter `captureMode`: The capture mode to enable.
     func setCaptureMode(_ captureMode: CaptureMode) throws {
-        // Update the internal capture mode value before performing the session configuration.
+        guard options.captureModes.contains(captureMode) else {
+            return
+        }
         self.captureMode = captureMode
-
-        // Change the configuration atomically.
         captureSession.beginConfiguration()
         defer { captureSession.commitConfiguration() }
-
-        // Configure the capture session for the selected capture mode.
         switch captureMode {
         case .photo:
-            // The app needs to remove the movie capture output to perform Live Photo capture.
-            captureSession.sessionPreset = .photo
-            captureSession.removeOutput(movieCapture.avCaptureOutput)
+            if let photoCaptureActual = photoCapture {
+                captureSession.sessionPreset = .photo
+                if let movieCaptureActual = movieCapture {
+                    // movie capture output should be removed to perform Live Photo capture
+                    captureSession.removeOutput(movieCaptureActual.avCaptureOutput)
+                }
+            }
         case .video:
-            captureSession.sessionPreset = .high
-            try addOutput(movieCapture.avCaptureOutput)
-            if isHDRVideoEnabled {
-                setHDRVideoEnabled(true)
+            if let movieCaptureActual = movieCapture {
+                captureSession.sessionPreset = .high
+                try addOutput(movieCaptureActual.avCaptureOutput)
+                if isHDRVideoEnabled {
+                    setHDRVideoEnabled(true)
+                }
             }
         }
-
-        // Update the advertised capabilities after reconfiguration.
         updateCaptureCapabilities()
     }
 
@@ -619,5 +618,6 @@ class CaptureControlsDelegate: NSObject, AVCaptureSessionControlsDelegate {
     func sessionControlsDidBecomeInactive(_ session: AVCaptureSession) {
         logger.debug("Capture controls inactive.")
     }
+
 }
 

@@ -57,12 +57,9 @@ public enum CaptureActivity: Sendable {
 
 }
 
-/// An enumeration of the capture modes that the camera supports.
 public enum CaptureMode: String, Identifiable, CaseIterable, Codable, Sendable {
 
-    /// A mode that enables photo capture.
     case photo
-    /// A mode that enables video capture.
     case video
 
     public var id: Self { self }
