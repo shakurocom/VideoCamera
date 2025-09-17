@@ -11,9 +11,11 @@ extension CMVideoDimensions: @retroactive Equatable, @retroactive Comparable {
     public static func < (lhs: CMVideoDimensions, rhs: CMVideoDimensions) -> Bool {
         lhs.width < rhs.width && lhs.height < rhs.height
     }
+
 }
 
 extension AVCaptureDevice {
+
     var activeFormat10BitVariant: AVCaptureDevice.Format? {
         formats.filter {
             $0.maxFrameRate == activeFormat.maxFrameRate &&
@@ -21,13 +23,17 @@ extension AVCaptureDevice {
         }
         .first(where: { $0.isTenBitFormat })
     }
+
 }
 
 extension AVCaptureDevice.Format {
+
     var isTenBitFormat: Bool {
         formatDescription.mediaSubType.rawValue == kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange
     }
+
     var maxFrameRate: Double {
         videoSupportedFrameRateRanges.last?.maxFrameRate ?? 0
     }
+
 }

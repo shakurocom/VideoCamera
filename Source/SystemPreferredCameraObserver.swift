@@ -1,9 +1,3 @@
-/*
- See the LICENSE.txt file for this sample’s licensing information.
-
- Abstract:
- An object that provides an asynchronous stream capture devices that represent the system-preferred camera.
- */
 import AVFoundation
 
 /// An object that provides an asynchronous stream capture devices that represent the system-preferred camera.

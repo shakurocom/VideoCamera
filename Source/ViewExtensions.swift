@@ -1,10 +1,3 @@
-/*
-See the LICENSE.txt file for this sample’s licensing information.
-
-Abstract:
-Extensions and supporting SwiftUI types.
-*/
-
 import SwiftUI
 import UIKit
 

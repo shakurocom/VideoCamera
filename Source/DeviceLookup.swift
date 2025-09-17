@@ -1,10 +1,3 @@
-/*
- See the LICENSE.txt file for this sample’s licensing information.
-
- Abstract:
- An object that retrieves camera and microphone devices.
- */
-
 import AVFoundation
 import Combine
 
@@ -23,6 +16,7 @@ final class DeviceLookup {
         frontCameraDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInTrueDepthCamera, .builtInWideAngleCamera],
                                                                        mediaType: .video,
                                                                        position: .front)
+        // TODO: implement
         //        externalCameraDiscoverSession = AVCaptureDevice.DiscoverySession(deviceTypes: [.external],
         //                                                                         mediaType: .video,
         //                                                                         position: .unspecified)
