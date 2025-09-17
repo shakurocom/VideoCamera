@@ -36,10 +36,7 @@ public class PreviewCameraModel: ObservableObject, Camera {
 
     // MARK: - Initialization
 
-    public init(captureMode: CaptureMode = .photo, status: CameraStatus = .unknown) {
-        self.captureMode = captureMode
-        self.status = status
-    }
+    public init() { }
 
     // MARK: - Public
 
@@ -48,6 +45,8 @@ public class PreviewCameraModel: ObservableObject, Camera {
             status = .running
         }
     }
+
+    public func setCaptureMode(_ captureMode: CaptureMode) { }
 
     public func switchVideoDevices() async {
         logger.debug("Device switching isn't implemented in PreviewCamera.")

@@ -19,7 +19,7 @@ final class PhotoCapture: OutputService {
     private var photoOutput: AVCapturePhotoOutput { avCaptureOutput }
 
     // The current capabilities available.
-    private(set) var capabilities: CaptureCapabilities = .unknown
+    private(set) var capabilities: CaptureCapabilities?
 
     // A count of Live Photo captures currently in progress.
     private var livePhotoCount = 0

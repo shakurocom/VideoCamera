@@ -26,7 +26,7 @@ class ExampleVideoCameraViewController: UIViewController {
         title = example?.title
 
         if isNewCameraShown {
-            let model = CameraModel(options: CameraModel.Options(isAudioAllowed: false))
+            let model = CameraModel(options: CameraModel.Options(isAudioAllowed: false, captureModes: []))
             cameraModel = model
             let previewSource = model.previewSource
             let previewView = PreviewView()

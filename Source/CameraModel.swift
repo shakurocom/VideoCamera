@@ -9,67 +9,41 @@ public final class CameraModel: ObservableObject, Camera {
     public struct Options {
 
         public let isAudioAllowed: Bool
-        public let isCaptureAllowed: Bool
+        public let captureModes: [CaptureMode]
 
         public init(isAudioAllowed: Bool,
-                    isCaptureAllowed: Bool) {
+                    captureModes: [CaptureMode]) {
             self.isAudioAllowed = isAudioAllowed
-            self.isCaptureAllowed = isCaptureAllowed
+            self.captureModes = captureModes
         }
 
     }
 
     @Published public private(set) var status = CameraStatus.unknown
-
-    public var captureMode = CaptureMode.photo { // photo video
-        didSet {
-            guard status == .running else { return }
-            Task {
-                isSwitchingModes = true
-                defer { isSwitchingModes = false }
-                // Update the configuration of the capture service for the new mode.
-                try? await captureService.setCaptureMode(captureMode)
-                // Update the persistent state value.
-                cameraState.captureMode = captureMode
-            }
-        }
-    }
-
     @Published public private(set) var isSwitchingModes = false // camera is currently switching capture modes
     @Published public private(set) var captureActivity = CaptureActivity.idle // photo capture, movie capture, or idle
     @Published public private(set) var isSwitchingVideoDevices = false
     @Published public private(set) var prefersMinimizedControlsUI = false
-
-    public var isLivePhotoEnabled = true {
-        didSet {
-            // Update the persistent state value.
-            cameraState.isLivePhotoEnabled = isLivePhotoEnabled
-        }
-    }
-
+    @Published public var isLivePhotoEnabled = true
     @Published public private(set) var isHDRVideoSupported = false // indicates whether the camera supports HDR video recording
 
-    public var isHDRVideoEnabled = false { // indicates whether camera enables HDR video recording
+    @Published public var isHDRVideoEnabled = false { // indicates whether camera enables HDR video recording
         didSet {
             guard status == .running, captureMode == .video else { return }
             Task {
                 await captureService.setHDRVideoEnabled(isHDRVideoEnabled)
-                // Update the persistent state value.
-                cameraState.isVideoHDREnabled = isHDRVideoEnabled
             }
         }
     }
 
     // value indicates how to balance the photo capture quality versus speed
-    @Published public var qualityPrioritization = QualityPrioritization.quality {
-        didSet {
-            // Update the persistent state value.
-            cameraState.qualityPrioritization = qualityPrioritization
-        }
+    @Published public var qualityPrioritization = QualityPrioritization.quality
+    @Published public private(set) var shouldFlashScreen = false // indicates whether to show visual feedback when capture begins
+
+    public var previewSource: PreviewSource {
+        return captureService.previewSource
     }
 
-    @Published public private(set) var shouldFlashScreen = false // indicates whether to show visual feedback when capture begins
-    public var previewSource: PreviewSource { captureService.previewSource }
     @Published public private(set) var thumbnail: CGImage? // thumbnail image for the most recent photo or video capture
     @Published public private(set) var error: Error? // error if the camera encountered a problem
 
@@ -77,16 +51,18 @@ public final class CameraModel: ObservableObject, Camera {
     private let captureService: CaptureService
     private let mediaLibrary: MediaLibrary?
 
-    @Published private var cameraState = CameraState() // TODO: implement - CameraState
+    @Published private var captureMode: CaptureMode?
+    @Published private var isVideoHDREnabled = true
+    @Published private var isVideoHDRSupported = true
 
     // MARK: - Initialization
 
     public init(options: Options) {
         self.options = options
-        self.captureService = CaptureService(options: CaptureService.Options(isAudioAllowed: options.isAudioAllowed))
-        if options.isCaptureAllowed {
-            mediaLibrary = MediaLibrary()
-        }
+        self.captureService = CaptureService(options: CaptureService.Options(isAudioAllowed: options.isAudioAllowed,
+                                                                             captureModes: options.captureModes))
+        self.mediaLibrary = options.captureModes.isEmpty ? nil : MediaLibrary()
+        self.captureMode = options.captureModes.first
     }
 
     // MARK: - Public
@@ -97,13 +73,25 @@ public final class CameraModel: ObservableObject, Camera {
             return
         }
         do {
-            try await captureService.start(with: cameraState)
+            try await captureService.start(newCaptureMode: captureMode, isVideoHDREnabledNew: isVideoHDREnabled)
             startObserving()
             status = .running
         } catch {
             logger.error("Failed to start capture service. \(error)")
             status = .failed
         }
+    }
+
+    public func setCaptureMode(_ captureMode: CaptureMode) {
+        guard status == .running && options.captureModes.contains(captureMode) else {
+            return
+        }
+        self.captureMode = captureMode
+        Task(operation: {
+            isSwitchingModes = true
+            defer { isSwitchingModes = false }
+            try? await captureService.setCaptureMode(captureMode)
+        })
     }
 
     public func switchVideoDevices() async {
@@ -180,8 +168,11 @@ public final class CameraModel: ObservableObject, Camera {
             }
             // await updates to the capabilities that the capture service advertises
             for await capabilities in await captureServiceActual.$captureCapabilities.values {
-                self?.isHDRVideoSupported = capabilities.isHDRSupported
-                self?.cameraState.isVideoHDRSupported = capabilities.isHDRSupported
+                guard let capabilitiesActual = capabilities else {
+                    continue
+                }
+                self?.isHDRVideoSupported = capabilitiesActual.isHDRSupported
+                self?.isVideoHDRSupported = capabilitiesActual.isHDRSupported
             }
         })
         Task(operation: { [weak self] in

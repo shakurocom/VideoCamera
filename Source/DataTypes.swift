@@ -136,6 +136,8 @@ enum CameraError: Error {
     case addOutputFailed
     case setupFailed
     case deviceChangeFailed
+    case photoCaptureNotAllowed
+    case movieCaptureNotAllowed
 }
 
 @CaptureServiceActor
@@ -145,7 +147,7 @@ protocol OutputService: Sendable {
 
     var avCaptureOutput: Output { get }
     var captureActivity: CaptureActivity { get }
-    var capabilities: CaptureCapabilities { get }
+    var capabilities: CaptureCapabilities? { get }
 
     func updateConfiguration(for device: AVCaptureDevice)
     @available(iOS 17.0, *)

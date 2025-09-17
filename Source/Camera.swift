@@ -4,7 +4,6 @@ import SwiftUI
 public protocol Camera: AnyObject, SendableMetatype, ObservableObject {
 
     var status: CameraStatus { get }
-    var captureMode: CaptureMode { get set } // photo video
     var isSwitchingModes: Bool { get } // camera is currently switching capture modes
     var captureActivity: CaptureActivity { get } // photo capture, movie capture, or idle
     var isSwitchingVideoDevices: Bool { get }
@@ -19,6 +18,7 @@ public protocol Camera: AnyObject, SendableMetatype, ObservableObject {
     var error: Error? { get } // error if the camera encountered a problem
 
     func start() async
+    func setCaptureMode(_ captureMode: CaptureMode)
     func switchVideoDevices() async
     func focusAndExpose(at point: CGPoint) async // func performs a one-time automatic focus and exposure operation
     func capturePhoto() async // captures a photo and writes it to the user's photo library

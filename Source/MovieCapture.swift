@@ -121,8 +121,8 @@ final class MovieCapture: OutputService {
 
     // MARK: - Configuration
     /// Returns the capabilities for this capture service.
-    var capabilities: CaptureCapabilities {
-        CaptureCapabilities(isHDRSupported: isHDRSupported)
+    var capabilities: CaptureCapabilities? {
+        return CaptureCapabilities(isHDRSupported: isHDRSupported)
     }
 
 }
