@@ -72,9 +72,8 @@ final class PhotoCapture: OutputService {
         return photoSettings
     }
 
-    private func monitorProgress(of delegate: PhotoCaptureDelegate, isolation: isolated (any Actor)? = #isolation) {
+    private func monitorProgress(of delegate: PhotoCaptureDelegate) {
         Task { @CaptureServiceActor in
-            _ = isolation
             var isLivePhoto = false
             // asynchronously monitor the activity of the delegate while the system performs capture
             for await activity in delegate.activityStream {
@@ -107,7 +106,7 @@ extension PhotoCapture {
 
     private class PhotoCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate {
 
-        let activityStream: AsyncStream<CaptureActivity> TODO: implement
+        let activityStream: AsyncStream<CaptureActivity>
 
         private let continuation: PhotoContinuation
 

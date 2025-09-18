@@ -492,9 +492,13 @@ final class CaptureService {
     /// Merge the `captureActivity` values of the photo and movie capture services,
     /// and assign the value to the actor's property.`
     private func observeOutputServices() {
-        // TODO: implement
-//        Publishers.Merge(photoCapture.$captureActivity, movieCapture.$captureActivity)
-//            .assign(to: &$captureActivity)
+        if let photoCaptureActual = photoCapture, let movieCaptureActual = movieCapture {
+            Publishers.Merge(photoCaptureActual.$captureActivity, movieCaptureActual.$captureActivity).assign(to: &$captureActivity)
+        } else if let photoCaptureActual = photoCapture {
+            photoCaptureActual.$captureActivity.assign(to: &$captureActivity)
+        } else if let movieCaptureActual = movieCapture {
+            movieCaptureActual.$captureActivity.assign(to: &$captureActivity)
+        }
     }
 
     /// observe when capture control enter and exit a fullscreen appearance
