@@ -1,6 +1,7 @@
 import Foundation
 @preconcurrency import AVFoundation
 import Combine
+import os.log
 
 @globalActor actor CaptureServiceActor: GlobalActor {
 
@@ -41,9 +42,28 @@ private final class DispatchQueueExecutor: SerialExecutor {
 @CaptureServiceActor
 final class CaptureService {
 
+    nonisolated static let logger = Logger()
+
     struct Options {
+
         let isAudioAllowed: Bool
         let captureModes: [CaptureMode]
+        let isVideoFeedEnabled: Bool
+        let isVideoFeedShouldDiscardLateFrames: Bool
+        weak var videoFeedDelegate: AVCaptureVideoDataOutputSampleBufferDelegate?
+
+        init(isAudioAllowed: Bool = false,
+             captureModes: [CaptureMode] = [],
+             isVideoFeedEnabled: Bool = false,
+             isVideoFeedShouldDiscardLateFrames: Bool = true,
+             videoFeedDelegate: AVCaptureVideoDataOutputSampleBufferDelegate? = nil) {
+            self.isAudioAllowed = isAudioAllowed
+            self.captureModes = captureModes
+            self.isVideoFeedEnabled = isVideoFeedEnabled
+            self.isVideoFeedShouldDiscardLateFrames = isVideoFeedShouldDiscardLateFrames
+            self.videoFeedDelegate = videoFeedDelegate
+        }
+
     }
 
     private struct CaptureSessionContainer: Sendable {
@@ -182,7 +202,7 @@ final class CaptureService {
         do {
             try focusAndExpose(at: devicePoint, isUserInitiated: true)
         } catch {
-            logger.debug("Unable to perform focus and exposure operation. \(error)")
+            CaptureService.logger.debug("Unable to perform focus and exposure operation. \(error)")
         }
     }
 
@@ -219,7 +239,7 @@ final class CaptureService {
             }
             captureSession.commitConfiguration()
         } catch {
-            logger.error("Unable to obtain lock on device and can't enable HDR video capture.")
+            CaptureService.logger.error("Unable to obtain lock on device and can't enable HDR video capture.")
             captureSession.commitConfiguration()
         }
     }
@@ -258,6 +278,16 @@ final class CaptureService {
                     try addOutput(movieCaptureActual.avCaptureOutput)
                     setHDRVideoEnabled(isHDRVideoEnabled)
                 }
+            }
+            // video data output
+            if options.isVideoFeedEnabled {
+                videoDataOutputQueue = DispatchQueue(label: "com.shakuro.devicecamera.videofeedqueue")
+                let output = AVCaptureVideoDataOutput()
+                output.alwaysDiscardsLateVideoFrames = options.isVideoFeedShouldDiscardLateFrames
+                output.videoSettings = options.videoFeedSettings
+                output.setSampleBufferDelegate(options.videoFeedDelegate, queue: videoDataOutputQueue)
+                try addOutput(output)
+                videoDataOutput = output
             }
             if #available(iOS 18.0, *) {
                 configureControls(for: defaultCamera) // TODO: implement
@@ -316,7 +346,7 @@ final class CaptureService {
             if captureSession.canAddControl(control) {
                 captureSession.addControl(control)
             } else {
-                logger.info("Unable to add control \(control).")
+                CaptureService.logger.info("Unable to add control \(control).")
             }
         }
         captureSession.setControlsDelegate(controlsDelegate, queue: CaptureService.sessionQueue)
@@ -342,7 +372,7 @@ final class CaptureService {
                     device.setFocusModeLocked(lensPosition: lensPosition)
                     device.unlockForConfiguration()
                 } catch {
-                    logger.info("Unable to change the lens position: \(error)")
+                    CaptureService.logger.info("Unable to change the lens position: \(error)")
                 }
             }
             controls.append(lensSlider)
@@ -422,7 +452,7 @@ final class CaptureService {
         Task(operation: {
             for await camera in systemPreferredCamera.changes {
                 if let camera, currentDevice != camera {
-                    logger.debug("Switching camera selection to the system-preferred camera.")
+                    CaptureService.logger.debug("Switching camera selection to the system-preferred camera.")
                     changeCaptureDevice(to: camera)
                 }
             }
@@ -542,21 +572,21 @@ class CaptureControlsDelegate: NSObject, AVCaptureSessionControlsDelegate {
     @Published private(set) var isShowingFullscreenControls = false
 
     func sessionControlsDidBecomeActive(_ session: AVCaptureSession) {
-        logger.debug("Capture controls active.")
+        CaptureService.logger.debug("Capture controls active.")
     }
 
     func sessionControlsWillEnterFullscreenAppearance(_ session: AVCaptureSession) {
         isShowingFullscreenControls = true
-        logger.debug("Capture controls will enter fullscreen appearance.")
+        CaptureService.logger.debug("Capture controls will enter fullscreen appearance.")
     }
 
     func sessionControlsWillExitFullscreenAppearance(_ session: AVCaptureSession) {
         isShowingFullscreenControls = false
-        logger.debug("Capture controls will exit fullscreen appearance.")
+        CaptureService.logger.debug("Capture controls will exit fullscreen appearance.")
     }
 
     func sessionControlsDidBecomeInactive(_ session: AVCaptureSession) {
-        logger.debug("Capture controls inactive.")
+        CaptureService.logger.debug("Capture controls inactive.")
     }
 
 }

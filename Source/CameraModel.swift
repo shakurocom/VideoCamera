@@ -1,7 +1,4 @@
-import os.log
 import SwiftUI
-
-let logger = Logger() // TODO: implement
 
 @MainActor
 public final class CameraModel: ObservableObject, Camera {
@@ -77,7 +74,7 @@ public final class CameraModel: ObservableObject, Camera {
             startObserving()
             status = .running
         } catch {
-            logger.error("Failed to start capture service. \(error)")
+            CaptureService.logger.error("Failed to start capture service. \(error)")
             status = .failed
         }
     }

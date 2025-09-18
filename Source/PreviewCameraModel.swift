@@ -49,19 +49,19 @@ public class PreviewCameraModel: ObservableObject, Camera {
     public func setCaptureMode(_ captureMode: CaptureMode) { }
 
     public func switchVideoDevices() async {
-        logger.debug("Device switching isn't implemented in PreviewCamera.")
+        CaptureService.logger.debug("Device switching isn't implemented in PreviewCamera.")
     }
 
     public func focusAndExpose(at point: CGPoint) async { // func performs a one-time automatic focus and exposure operation
-        logger.debug("Focus and expose isn't implemented in PreviewCamera.")
+        CaptureService.logger.debug("Focus and expose isn't implemented in PreviewCamera.")
     }
 
     public func capturePhoto() async { // captures a photo and writes it to the user's photo library
-        logger.debug("Photo capture isn't implemented in PreviewCamera.")
+        CaptureService.logger.debug("Photo capture isn't implemented in PreviewCamera.")
     }
 
     public func toggleRecording() async { // starts or stops recording a movie, and writes it to the user's photo library when complete
-        logger.debug("Moving capture isn't implemented in PreviewCamera.")
+        CaptureService.logger.debug("Moving capture isn't implemented in PreviewCamera.")
     }
 
 }

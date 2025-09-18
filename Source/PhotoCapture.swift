@@ -154,7 +154,7 @@ extension PhotoCapture {
                          resolvedSettings: AVCaptureResolvedPhotoSettings,
                          error: Error?) {
             if let error {
-                logger.debug("Error processing Live Photo companion movie: \(String(describing: error))")
+                CaptureService.logger.debug("Error processing Live Photo companion movie: \(String(describing: error))")
             }
             livePhotoMovieURL = outputFileURL
         }
@@ -164,7 +164,7 @@ extension PhotoCapture {
                          didFinishCapturingDeferredPhotoProxy deferredPhotoProxy: AVCaptureDeferredPhotoProxy?,
                          error: Error?) {
             if let error = error {
-                logger.debug("Error capturing deferred photo: \(error)")
+                CaptureService.logger.debug("Error capturing deferred photo: \(error)")
                 return
             }
             // capture the data for this photo
@@ -174,7 +174,7 @@ extension PhotoCapture {
 
         func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
             if let error = error {
-                logger.debug("Error capturing photo: \(String(describing: error))")
+                CaptureService.logger.debug("Error capturing photo: \(String(describing: error))")
                 return
             }
             photoData = photo.fileDataRepresentation()
