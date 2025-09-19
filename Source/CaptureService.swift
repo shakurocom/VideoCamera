@@ -39,34 +39,23 @@ private final class DispatchQueueExecutor: SerialExecutor {
 
 }
 
+public struct CMSampleBufferUncheckedSendable: @unchecked Sendable {
+    internal let buffer: CMSampleBuffer
+}
+
 @CaptureServiceActor
-final class CaptureService {
+final class CaptureService: NSObject {
 
     nonisolated static let logger = Logger()
 
-    struct Options {
+    struct Options: Sendable {
 
         let isAudioAllowed: Bool
         let captureModes: [CaptureMode]
 
         let isVideoFeedEnabled: Bool
         let isVideoFeedShouldDiscardLateFrames: Bool
-        let videoFeedSettings: [String: Any]
-        weak var videoFeedDelegate: AVCaptureVideoDataOutputSampleBufferDelegate?
-
-        init(isAudioAllowed: Bool = false,
-             captureModes: [CaptureMode] = [],
-             isVideoFeedEnabled: Bool = false,
-             isVideoFeedShouldDiscardLateFrames: Bool = true,
-             videoFeedSettings: [String: Any] = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA],
-             videoFeedDelegate: AVCaptureVideoDataOutputSampleBufferDelegate? = nil) { // TODO: implement - replace with stream
-            self.isAudioAllowed = isAudioAllowed
-            self.captureModes = captureModes
-            self.isVideoFeedEnabled = isVideoFeedEnabled
-            self.isVideoFeedShouldDiscardLateFrames = isVideoFeedShouldDiscardLateFrames
-            self.videoFeedSettings = videoFeedSettings
-            self.videoFeedDelegate = videoFeedDelegate
-        }
+        let videoFeedSettings: [String: any Sendable]
 
     }
 
@@ -90,12 +79,16 @@ final class CaptureService {
 
     let previewSource: PreviewSource  // connects a preview destination with the capture session.
 
+    let didOutputSampleBuffer: AsyncStream<CMSampleBufferUncheckedSendable>
+
     private let options: Options
     private let captureSessionContainer: CaptureSessionContainer
     private let photoCapture: PhotoCapture?
     private let movieCapture: MovieCapture?
     private let deviceLookup = DeviceLookup()
     private let systemPreferredCamera = SystemPreferredCameraObserver() // monitors the state of the system-preferred camera
+
+    private let didOutputSampleBufferContinuation: AsyncStream<CMSampleBufferUncheckedSendable>.Continuation
 
     private var activeVideoInput: AVCaptureDeviceInput? // video input for the currently selected device camera
     private(set) var captureMode: CaptureMode?
@@ -166,6 +159,13 @@ final class CaptureService {
         self.previewSource = DefaultPreviewSource(session: session)
         self.photoCapture = options.captureModes.contains(.photo) ? PhotoCapture() : nil
         self.movieCapture = options.captureModes.contains(.video) ? MovieCapture() : nil
+        let (didOutputSampleBuffer, didOutputSampleBufferContinuation) = AsyncStream.makeStream(of: CMSampleBufferUncheckedSendable.self)
+        self.didOutputSampleBuffer = didOutputSampleBuffer
+        self.didOutputSampleBufferContinuation = didOutputSampleBufferContinuation
+    }
+
+    deinit {
+        didOutputSampleBufferContinuation.finish()
     }
 
     // MARK: - Public
@@ -313,7 +313,7 @@ final class CaptureService {
                 let output = AVCaptureVideoDataOutput()
                 output.alwaysDiscardsLateVideoFrames = options.isVideoFeedShouldDiscardLateFrames
                 output.videoSettings = options.videoFeedSettings
-                output.setSampleBufferDelegate(options.videoFeedDelegate, queue: videoDataOutputQueue)
+                output.setSampleBufferDelegate(self, queue: videoDataOutputQueue)
                 try addOutput(output)
                 videoDataOutput = output
             }
@@ -595,7 +595,22 @@ final class CaptureService {
     }
 }
 
-class CaptureControlsDelegate: NSObject, AVCaptureSessionControlsDelegate {
+// MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
+
+extension CaptureService: AVCaptureVideoDataOutputSampleBufferDelegate {
+
+    nonisolated func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        let sampleBufferUncheckedSendable: CMSampleBufferUncheckedSendable = CMSampleBufferUncheckedSendable(buffer: sampleBuffer)
+        Task(operation: { @CaptureServiceActor in
+            didOutputSampleBufferContinuation.yield(sampleBufferUncheckedSendable)
+        })
+    }
+
+}
+
+// MARK - CaptureControlsDelegate
+
+private class CaptureControlsDelegate: NSObject, AVCaptureSessionControlsDelegate {
 
     @Published private(set) var isShowingFullscreenControls = false
 

@@ -8,10 +8,20 @@ public final class CameraModel: ObservableObject, Camera {
         public let isAudioAllowed: Bool
         public let captureModes: [CaptureMode]
 
-        public init(isAudioAllowed: Bool,
-                    captureModes: [CaptureMode]) {
+        let isVideoFeedEnabled: Bool
+        let isVideoFeedShouldDiscardLateFrames: Bool
+        let videoFeedSettings: [String: any Sendable]
+
+        public init(isAudioAllowed: Bool = false,
+                    captureModes: [CaptureMode] = [],
+                    isVideoFeedEnabled: Bool = false,
+                    isVideoFeedShouldDiscardLateFrames: Bool = true,
+                    videoFeedSettings: [String: any Sendable] = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]) {
             self.isAudioAllowed = isAudioAllowed
             self.captureModes = captureModes
+            self.isVideoFeedEnabled = isVideoFeedEnabled
+            self.isVideoFeedShouldDiscardLateFrames = isVideoFeedShouldDiscardLateFrames
+            self.videoFeedSettings = videoFeedSettings
         }
 
     }
@@ -52,12 +62,21 @@ public final class CameraModel: ObservableObject, Camera {
     @Published private var isVideoHDREnabled = true
     @Published private var isVideoHDRSupported = true
 
+    var didOutputSampleBuffer: AsyncStream<CMSampleBufferUncheckedSendable> {
+        return captureService.didOutputSampleBuffer
+    }
+
     // MARK: - Initialization
 
     public init(options: Options) {
         self.options = options
-        self.captureService = CaptureService(options: CaptureService.Options(isAudioAllowed: options.isAudioAllowed,
-                                                                             captureModes: options.captureModes))
+        self.captureService = CaptureService(options: CaptureService.Options(
+            isAudioAllowed: options.isAudioAllowed,
+            captureModes: options.captureModes,
+            isVideoFeedEnabled: options.isVideoFeedEnabled,
+            isVideoFeedShouldDiscardLateFrames: options.isVideoFeedShouldDiscardLateFrames,
+            videoFeedSettings: options.videoFeedSettings
+        ))
         self.mediaLibrary = options.captureModes.isEmpty ? nil : MediaLibrary()
         self.captureMode = options.captureModes.first
     }
@@ -131,7 +150,11 @@ public final class CameraModel: ObservableObject, Camera {
         }
     }
 
-    // MARK: - Private
+}
+
+// MARK: - Private
+
+private extension CameraModel {
 
     private func startObserving() {
         Task(operation: { [weak self] in
