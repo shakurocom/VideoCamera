@@ -48,19 +48,23 @@ final class CaptureService {
 
         let isAudioAllowed: Bool
         let captureModes: [CaptureMode]
+
         let isVideoFeedEnabled: Bool
         let isVideoFeedShouldDiscardLateFrames: Bool
+        let videoFeedSettings: [String: Any]
         weak var videoFeedDelegate: AVCaptureVideoDataOutputSampleBufferDelegate?
 
         init(isAudioAllowed: Bool = false,
              captureModes: [CaptureMode] = [],
              isVideoFeedEnabled: Bool = false,
              isVideoFeedShouldDiscardLateFrames: Bool = true,
-             videoFeedDelegate: AVCaptureVideoDataOutputSampleBufferDelegate? = nil) {
+             videoFeedSettings: [String: Any] = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA],
+             videoFeedDelegate: AVCaptureVideoDataOutputSampleBufferDelegate? = nil) { // TODO: implement - replace with stream
             self.isAudioAllowed = isAudioAllowed
             self.captureModes = captureModes
             self.isVideoFeedEnabled = isVideoFeedEnabled
             self.isVideoFeedShouldDiscardLateFrames = isVideoFeedShouldDiscardLateFrames
+            self.videoFeedSettings = videoFeedSettings
             self.videoFeedDelegate = videoFeedDelegate
         }
 
@@ -102,6 +106,9 @@ final class CaptureService {
     private var controlsDelegate = CaptureControlsDelegate() // object that responds to capture control activation and presentation events
     private var subjectAreaChangeTask: Task<Void, Never>?
 
+    private var videoDataOutput: AVCaptureVideoDataOutput?
+    private var videoDataOutputQueue: DispatchQueue?
+
     private var outputServices: [any OutputService] {
         var result: [any OutputService] = []
         if let photoCaptureActual = photoCapture {
@@ -126,6 +133,27 @@ final class CaptureService {
             }
             return isAuthorized
         }
+    }
+
+    var videoDataOutputSize: CGSize {
+        guard let output = videoDataOutput else {
+            return CGSize.zero
+        }
+        if let width = (output.videoSettings[kCVPixelBufferWidthKey as String]) as? NSNumber,
+           let height = output.videoSettings[kCVPixelBufferHeightKey as String] as? NSNumber {
+            return CGSize(width: width.doubleValue, height: height.doubleValue)
+        } else {
+            return CGSize.zero
+        }
+    }
+
+    var videoDataOutputOrientation: AVCaptureVideoOrientation {
+        guard let output = videoDataOutput,
+              let connection = output.connection(with: AVMediaType.video)
+        else {
+            return AVCaptureVideoOrientation.portrait
+        }
+        return connection.videoOrientation
     }
 
     // MARK: - Initialization

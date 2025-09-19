@@ -636,12 +636,12 @@ extension DeviceCamera: VideoCamera {
 
     var videoDataOutputSize: CGSize {
         guard self.cameraDeviceInitializationStatus == .initialized,
-            let output = videoDataOutput
-            else {
-                return CGSize.zero
+              let output = videoDataOutput
+        else {
+            return CGSize.zero
         }
         if let width = (output.videoSettings[kCVPixelBufferWidthKey as String]) as? NSNumber,
-            let height = output.videoSettings[kCVPixelBufferHeightKey as String] as? NSNumber {
+           let height = output.videoSettings[kCVPixelBufferHeightKey as String] as? NSNumber {
             return CGSize(width: width.doubleValue, height: height.doubleValue)
         } else {
             return CGSize.zero
@@ -650,10 +650,10 @@ extension DeviceCamera: VideoCamera {
 
     var videoDataOutputOrientation: AVCaptureVideoOrientation {
         guard self.cameraDeviceInitializationStatus == .initialized,
-            let output = videoDataOutput,
-            let connection = output.connection(with: AVMediaType.video)
-            else {
-                return AVCaptureVideoOrientation.portrait
+              let output = videoDataOutput,
+              let connection = output.connection(with: AVMediaType.video)
+        else {
+            return AVCaptureVideoOrientation.portrait
         }
         return connection.videoOrientation
     }
