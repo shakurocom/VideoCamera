@@ -40,7 +40,7 @@ private final class DispatchQueueExecutor: SerialExecutor {
 }
 
 public struct CMSampleBufferUncheckedSendable: @unchecked Sendable {
-    internal let buffer: CMSampleBuffer
+    public let buffer: CMSampleBuffer
 }
 
 @CaptureServiceActor
@@ -211,7 +211,7 @@ final class CaptureService: NSObject {
     /// implementation switches between the front and back cameras and, in iPadOS, connected external cameras.
     func selectNextVideoDevice() {
         let videoDevices = deviceLookup.cameras
-        let selectedIndex = videoDevices.firstIndex(of: currentDevice) ?? 0
+        let selectedIndex = videoDevices.firstIndex(of: currentDevice()) ?? 0
         var nextIndex = selectedIndex + 1
         if nextIndex == videoDevices.endIndex {
             nextIndex = 0
@@ -232,6 +232,19 @@ final class CaptureService: NSObject {
         } catch {
             CaptureService.logger.debug("Unable to perform focus and exposure operation. \(error)")
         }
+    }
+
+    func setFocusMode(_ mode: AVCaptureDevice.FocusMode, focusPointOfInterest: CGPoint) throws {
+        let device = self.currentDevice()
+        guard device.isFocusPointOfInterestSupported,
+              device.isFocusModeSupported(mode)
+        else {
+            return
+        }
+        try device.lockForConfiguration()
+        device.focusPointOfInterest = focusPointOfInterest
+        device.focusMode = mode
+        device.unlockForConfiguration()
     }
 
     func capturePhoto(with features: PhotoFeatures) async throws -> Photo {
@@ -256,10 +269,11 @@ final class CaptureService: NSObject {
         captureSession.beginConfiguration()
         do {
             // if the current device provides a 10-bit HDR format, enable it
-            if isEnabled, let format = currentDevice.activeFormat10BitVariant {
-                try currentDevice.lockForConfiguration()
-                currentDevice.activeFormat = format
-                currentDevice.unlockForConfiguration()
+            let device = currentDevice()
+            if isEnabled, let format = device.activeFormat10BitVariant {
+                try device.lockForConfiguration()
+                device.activeFormat = format
+                device.unlockForConfiguration()
                 isHDRVideoEnabled = true
             } else {
                 captureSession.sessionPreset = .high
@@ -354,7 +368,7 @@ final class CaptureService: NSObject {
         }
     }
 
-    private var currentDevice: AVCaptureDevice {
+    private func currentDevice() -> AVCaptureDevice {
         guard let device = activeVideoInput?.device else {
             fatalError("No device found for current video input.")
         }
@@ -411,6 +425,7 @@ final class CaptureService: NSObject {
 
     // Observe notifications of type `subjectAreaDidChangeNotification` for the specified device.
     private func observeSubjectAreaChanges(of device: AVCaptureDevice) {
+        // TODO: implement - disable in options???
         subjectAreaChangeTask?.cancel()
         subjectAreaChangeTask = Task {
             for await _ in NotificationCenter.default.notifications(named: AVCaptureDevice.subjectAreaDidChangeNotification,
@@ -422,7 +437,7 @@ final class CaptureService: NSObject {
     }
 
     private func focusAndExpose(at devicePoint: CGPoint, isUserInitiated: Bool) throws {
-        let device = currentDevice
+        let device = currentDevice()
         // the following mode and point of interest configuration requires obtaining an exclusive lock on the device
         try device.lockForConfiguration()
         let focusMode = isUserInitiated ? AVCaptureDevice.FocusMode.autoFocus : .continuousAutoFocus
@@ -479,7 +494,7 @@ final class CaptureService: NSObject {
     private func monitorSystemPreferredCamera() {
         Task(operation: {
             for await camera in systemPreferredCamera.changes {
-                if let camera, currentDevice != camera {
+                if let camera, currentDevice() != camera {
                     CaptureService.logger.debug("Switching camera selection to the system-preferred camera.")
                     changeCaptureDevice(to: camera)
                 }
@@ -535,7 +550,7 @@ final class CaptureService: NSObject {
     /// determine which features to enable in the user interface.
     private func updateCaptureCapabilities() {
         // Update the output service configuration.
-        outputServices.forEach { $0.updateConfiguration(for: currentDevice) }
+        outputServices.forEach { $0.updateConfiguration(for: currentDevice()) }
         // Set the capture service's capabilities for the selected mode.
         switch captureMode {
         case .photo:

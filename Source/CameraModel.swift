@@ -1,3 +1,4 @@
+@preconcurrency import AVFoundation
 import SwiftUI
 
 @MainActor
@@ -62,7 +63,7 @@ public final class CameraModel: ObservableObject, Camera {
     @Published private var isVideoHDREnabled = true
     @Published private var isVideoHDRSupported = true
 
-    var didOutputSampleBuffer: AsyncStream<CMSampleBufferUncheckedSendable> {
+    public var didOutputSampleBuffer: AsyncStream<CMSampleBufferUncheckedSendable> {
         return captureService.didOutputSampleBuffer
     }
 
@@ -118,6 +119,10 @@ public final class CameraModel: ObservableObject, Camera {
 
     public func focusAndExpose(at point: CGPoint) async { // func performs a one-time automatic focus and exposure operation
         await captureService.focusAndExpose(at: point)
+    }
+
+    public func setFocusMode(_ mode: AVCaptureDevice.FocusMode, focusPointOfInterest: CGPoint) async throws {
+        try await captureService.setFocusMode(mode, focusPointOfInterest: focusPointOfInterest)
     }
 
     public func capturePhoto() async { // captures a photo and writes it to the user's photo library
