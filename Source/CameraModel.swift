@@ -84,6 +84,18 @@ public final class CameraModel: ObservableObject, Camera {
 
     // MARK: - Public
 
+    public func videoDataOutputSize() async -> CGSize {
+        return await captureService.videoDataOutputSize
+    }
+
+    public func smoothAutoFocusEnabled() async -> Bool {
+        return await captureService.smoothAutoFocusEnabled()
+    }
+
+    public func setSmoothAutoFocusEnabled(_ enabled: Bool) async throws {
+        try await captureService.setSmoothAutoFocusEnabled(enabled)
+    }
+
     public func start() async {
         guard await captureService.isAuthorized else { // TODO: implement
             status = .unauthorized
