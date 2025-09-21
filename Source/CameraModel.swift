@@ -67,6 +67,12 @@ public final class CameraModel: ObservableObject, Camera {
         return captureService.didOutputSampleBuffer
     }
 
+    public var hasTorch: Bool {
+        get async {
+            return await captureService.hasTorch
+        }
+    }
+
     // MARK: - Initialization
 
     public init(options: Options) {

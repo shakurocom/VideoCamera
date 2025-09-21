@@ -149,24 +149,12 @@ final class CaptureService: NSObject {
         return connection.videoOrientation
     }
 
-    func smoothAutoFocusEnabled() -> Bool {
+    var hasTorch: Bool {
         if let device = currentDevice() {
-            return device.isSmoothAutoFocusEnabled
+            return device.hasTorch
         } else {
             return false
         }
-    }
-
-    func setSmoothAutoFocusEnabled(_ enabled: Bool) throws {
-        guard let device = currentDevice(),
-              device.isSmoothAutoFocusSupported,
-              device.isSmoothAutoFocusEnabled != enabled
-        else {
-            return
-        }
-        try device.lockForConfiguration()
-        device.isSmoothAutoFocusEnabled = enabled
-        device.unlockForConfiguration()
     }
 
     // MARK: - Initialization
@@ -278,6 +266,26 @@ final class CaptureService: NSObject {
         try device.lockForConfiguration()
         device.focusPointOfInterest = focusPointOfInterest
         device.focusMode = mode
+        device.unlockForConfiguration()
+    }
+
+    func smoothAutoFocusEnabled() -> Bool {
+        if let device = currentDevice() {
+            return device.isSmoothAutoFocusEnabled
+        } else {
+            return false
+        }
+    }
+
+    func setSmoothAutoFocusEnabled(_ enabled: Bool) throws {
+        guard let device = currentDevice(),
+              device.isSmoothAutoFocusSupported,
+              device.isSmoothAutoFocusEnabled != enabled
+        else {
+            return
+        }
+        try device.lockForConfiguration()
+        device.isSmoothAutoFocusEnabled = enabled
         device.unlockForConfiguration()
     }
 
