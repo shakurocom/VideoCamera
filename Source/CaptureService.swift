@@ -53,6 +53,7 @@ final class CaptureService: NSObject {
         let isAudioAllowed: Bool
         let captureModes: [CaptureMode]
         let videoGravity: AVLayerVideoGravity
+        let captureSessionPreset: AVCaptureSession.Preset?
 
         let isVideoFeedEnabled: Bool
         let isVideoFeedShouldDiscardLateFrames: Bool
@@ -382,6 +383,19 @@ final class CaptureService: NSObject {
             guard let defaultCamera = deviceLookup.getCamera(position: .back) else {
                 throw CameraError.videoDeviceUnavailable
             }
+
+            if let preset = options.captureSessionPreset {
+                if captureSession.canSetSessionPreset(preset) {
+                    captureSession.sessionPreset = preset
+                } else {
+                    CaptureService.logger.error("Unable to set capture session preset: \(String(describing: preset)); fallback to \(String(describing: self.captureSession.sessionPreset))")
+                }
+            } else {
+                if let captureModeActual = captureMode {
+                    captureSession.sessionPreset = captureModeActual == .photo ? .photo : .high
+                }
+            }
+
             activeVideoInput = try addInput(for: defaultCamera)
             if options.isAudioAllowed {
                 let defaultMic = try deviceLookup.defaultMic
@@ -392,7 +406,6 @@ final class CaptureService: NSObject {
                 try addInput(for: defaultMic)
             }
             if photoCapture != nil || movieCapture != nil {
-                captureSession.sessionPreset = captureMode == .photo ? .photo : .high
                 if let photoCaptureActual = photoCapture {
                     try addOutput(photoCaptureActual.avCaptureOutput)
                 }

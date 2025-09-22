@@ -8,7 +8,8 @@ public final class CameraModel: ObservableObject, Camera {
 
         public let isAudioAllowed: Bool
         public let captureModes: [CaptureMode]
-        public let videoGravity: AVLayerVideoGravity = .resizeAspect
+        public let videoGravity: AVLayerVideoGravity
+        public let captureSessionPreset: AVCaptureSession.Preset?
 
         let isVideoFeedEnabled: Bool
         let isVideoFeedShouldDiscardLateFrames: Bool
@@ -16,11 +17,15 @@ public final class CameraModel: ObservableObject, Camera {
 
         public init(isAudioAllowed: Bool = false,
                     captureModes: [CaptureMode] = [],
+                    videoGravity: AVLayerVideoGravity = .resizeAspect,
+                    captureSessionPreset: AVCaptureSession.Preset? = nil,
                     isVideoFeedEnabled: Bool = false,
                     isVideoFeedShouldDiscardLateFrames: Bool = true,
                     videoFeedSettings: [String: any Sendable] = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]) {
             self.isAudioAllowed = isAudioAllowed
             self.captureModes = captureModes
+            self.videoGravity = videoGravity
+            self.captureSessionPreset = captureSessionPreset
             self.isVideoFeedEnabled = isVideoFeedEnabled
             self.isVideoFeedShouldDiscardLateFrames = isVideoFeedShouldDiscardLateFrames
             self.videoFeedSettings = videoFeedSettings
@@ -82,6 +87,7 @@ public final class CameraModel: ObservableObject, Camera {
             isAudioAllowed: options.isAudioAllowed,
             captureModes: options.captureModes,
             videoGravity: options.videoGravity,
+            captureSessionPreset: options.captureSessionPreset,
             isVideoFeedEnabled: options.isVideoFeedEnabled,
             isVideoFeedShouldDiscardLateFrames: options.isVideoFeedShouldDiscardLateFrames,
             videoFeedSettings: options.videoFeedSettings
