@@ -591,10 +591,13 @@ final class CaptureService: NSObject {
     /// isn't the currently selected camera, switch to the new device.
     private func monitorSystemPreferredCamera() {
         observeTasks.append(Task(operation: { [weak self] in
-            for await camera in systemPreferredCamera.changes {
-                if let camera, currentDevice() != camera {
+            guard let changes = self?.systemPreferredCamera.changes else {
+                return
+            }
+            for await camera in changes {
+                if let camera, self?.currentDevice() != camera {
                     CaptureService.logger.debug("Switching camera selection to the system-preferred camera.")
-                    changeCaptureDevice(to: camera)
+                    self?.changeCaptureDevice(to: camera)
                 }
             }
         }))
@@ -682,13 +685,13 @@ final class CaptureService: NSObject {
             for await reason in NotificationCenter.default.notifications(named: AVCaptureSession.wasInterruptedNotification)
                 .compactMap({ $0.userInfo?[AVCaptureSessionInterruptionReasonKey] as AnyObject? })
                 .compactMap({ AVCaptureSession.InterruptionReason(rawValue: $0.integerValue) }) {
-                isInterrupted = [.audioDeviceInUseByAnotherClient, .videoDeviceInUseByAnotherClient].contains(reason)
+                self?.isInterrupted = [.audioDeviceInUseByAnotherClient, .videoDeviceInUseByAnotherClient].contains(reason)
             }
         }))
 
         observeTasks.append(Task(operation: { [weak self] in
             for await _ in NotificationCenter.default.notifications(named: AVCaptureSession.interruptionEndedNotification) {
-                isInterrupted = false
+                self?.isInterrupted = false
             }
         }))
 
@@ -699,8 +702,8 @@ final class CaptureService: NSObject {
                 guard error.code == .mediaServicesWereReset else {
                     continue
                 }
-                if !captureSession.isRunning {
-                    captureSession.startRunning()
+                if let session = self?.captureSession, !session.isRunning {
+                    session.startRunning()
                 }
             }
         }))
@@ -714,7 +717,7 @@ extension CaptureService: AVCaptureVideoDataOutputSampleBufferDelegate {
     nonisolated func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         let sampleBufferUncheckedSendable: CMSampleBufferUncheckedSendable = CMSampleBufferUncheckedSendable(buffer: sampleBuffer)
         Task(operation: { @CaptureServiceActor [weak self] in
-            didOutputSampleBufferContinuation.yield(sampleBufferUncheckedSendable)
+            self?.didOutputSampleBufferContinuation.yield(sampleBufferUncheckedSendable)
         })
     }
 
