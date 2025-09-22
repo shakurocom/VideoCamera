@@ -13,24 +13,24 @@ let movieAspectRatio = AspectRatio(width: 9.0, height: 16.0)
 /// of the camera preview to better fit the UI when in photo capture mode.
 @MainActor
 struct PreviewContainer<Content: View, CameraModel: Camera>: View {
-    
+
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    
+
     @StateObject var camera: CameraModel
 
     // State values for transition effects.
     @State private var blurRadius = CGFloat.zero
-    
+
     // When running in photo capture mode on a compact device size, move the preview area
     // update by the offset amount so that it's better centered between the top and bottom bars.
     private let photoModeOffset = CGFloat(-44)
     private let content: Content
-    
+
     init(camera: CameraModel, @ViewBuilder content: () -> Content) {
         self._camera = StateObject(wrappedValue: camera)
         self.content = content()
     }
-    
+
     var body: some View {
         // On compact devices, show a view finder rectangle around the video preview bounds.
         if horizontalSizeClass == .compact {
@@ -47,7 +47,7 @@ struct PreviewContainer<Content: View, CameraModel: Camera>: View {
             previewView
         }
     }
-    
+
     /// Attach animations to the camera preview.
     var previewView: some View {
         content
@@ -55,14 +55,15 @@ struct PreviewContainer<Content: View, CameraModel: Camera>: View {
             .onChange(of: camera.isSwitchingModes, updateBlurRadius(_:_:))
             .onChange(of: camera.isSwitchingVideoDevices, updateBlurRadius(_:_:))
     }
-    
+
     func updateBlurRadius(_: Bool, _ isSwitching: Bool) {
         withAnimation {
             blurRadius = isSwitching ? 30 : 0
         }
     }
-    
+
     var aspectRatio: AspectRatio {
         camera.captureMode == .photo ? photoAspectRatio : movieAspectRatio
     }
+
 }

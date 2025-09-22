@@ -66,7 +66,6 @@ public class PreviewView: UIView, PreviewTarget {
 
 }
 
-
 /// A protocol that enables a preview source to connect to a preview target.
 ///
 /// The app provides an instance of this type to the client tier so it can connect

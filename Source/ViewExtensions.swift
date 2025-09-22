@@ -24,13 +24,13 @@ public struct AdaptiveToolbar<Content: View>: PlatformView {
     private let horizontalSpacing: CGFloat
     private let verticalSpacing: CGFloat
     private let content: Content
-    
+
     public init(horizontalSpacing: CGFloat = 0.0, verticalSpacing: CGFloat = 0.0, @ViewBuilder content: () -> Content) {
         self.content = content()
         self.horizontalSpacing = horizontalSpacing
         self.verticalSpacing = verticalSpacing
     }
-    
+
     public var body: some View {
         if isRegularSize {
             VStack(spacing: verticalSpacing) { content }
@@ -50,24 +50,24 @@ public struct DefaultButtonStyle: ButtonStyle {
         case small = 22
         case large = 24
     }
-    
+
     private let size: Size
-    
+
     public init(size: Size) {
         self.size = size
     }
-    
+
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .foregroundColor(isEnabled ? .primary : Color(white: 0.4))
             .font(.system(size: size.rawValue))
-            // Pad buttons on devices that use the `regular` size class,
-            // and also when explicitly requesting large buttons.
+        // Pad buttons on devices that use the `regular` size class,
+        // and also when explicitly requesting large buttons.
             .padding(isRegularSize || size == .large ? 10.0 : 0)
             .background(.black.opacity(0.4))
             .clipShape(size == .small ? AnyShape(Rectangle()) : AnyShape(Circle()))
     }
-    
+
     public var isRegularSize: Bool {
         horizontalSizeClass == .regular && verticalSizeClass == .regular
     }

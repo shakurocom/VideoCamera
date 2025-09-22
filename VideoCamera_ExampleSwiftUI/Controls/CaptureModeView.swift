@@ -3,15 +3,15 @@ import VideoCamera_Framework
 
 /// A view that toggles the camera's capture mode.
 struct CaptureModeView<CameraModel: Camera>: View {
-    
+
     @StateObject var camera: CameraModel
     @Binding private var direction: SwipeDirection
-    
+
     init(camera: CameraModel, direction: Binding<SwipeDirection>) {
         self._camera = StateObject(wrappedValue: camera)
         _direction = direction
     }
-    
+
     var body: some View {
         Picker("Capture Mode", selection: $camera.captureMode) {
             ForEach(CaptureMode.allCases) {
@@ -28,7 +28,7 @@ struct CaptureModeView<CameraModel: Camera>: View {
             // Increment the selected index when swiping right.
             let increment = direction == .right
             let newIndex = selectedIndex + (increment ? 1 : -1)
-            
+
             guard newIndex >= 0, newIndex < modes.count else { return }
             camera.captureMode = modes[newIndex]
         }

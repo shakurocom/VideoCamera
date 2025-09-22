@@ -7,10 +7,10 @@ struct CameraUI<CameraModel: Camera>: PlatformView {
 
     @StateObject var camera: CameraModel
     @Binding var swipeDirection: SwipeDirection
-    
+
     @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    
+
     var body: some View {
         Group {
             if isRegularSize {
@@ -33,7 +33,7 @@ struct CameraUI<CameraModel: Camera>: PlatformView {
             StatusOverlayView(status: camera.status)
         }
     }
-    
+
     /// This view arranges UI elements vertically.
     @ViewBuilder
     var compactUI: some View {
@@ -45,7 +45,7 @@ struct CameraUI<CameraModel: Camera>: PlatformView {
                 .padding(.bottom, bottomPadding)
         }
     }
-    
+
     /// This view arranges UI elements in a layered stack.
     @ViewBuilder
     var regularUI: some View {
@@ -65,7 +65,7 @@ struct CameraUI<CameraModel: Camera>: PlatformView {
             .padding(.bottom, 32)
         }
     }
-    
+
     var swipeGesture: some Gesture {
         DragGesture(minimumDistance: 50)
             .onEnded {
@@ -73,13 +73,14 @@ struct CameraUI<CameraModel: Camera>: PlatformView {
                 swipeDirection = $0.translation.width < 0 ? .left : .right
             }
     }
-    
+
     var bottomPadding: CGFloat {
         // Dynamically calculate the offset for the bottom toolbar in iOS.
         let bounds = UIScreen.main.bounds
         let rect = AVMakeRect(aspectRatio: movieAspectRatio, insideRect: bounds)
         return (rect.minY.rounded() / 2) + 12
     }
+
 }
 
 #Preview {

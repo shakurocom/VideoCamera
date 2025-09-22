@@ -26,4 +26,3 @@ struct LiveBadge: View {
         .padding()
         .background(.black)
 }
-

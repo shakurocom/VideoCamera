@@ -3,12 +3,12 @@ import VideoCamera_Framework
 
 /// A view that presents controls to enable capture features.
 struct FeaturesToolbar<CameraModel: Camera>: PlatformView {
-    
+
     @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    
+
     @StateObject var camera: CameraModel
-    
+
     var body: some View {
         HStack(spacing: 30) {
             Spacer()
@@ -27,7 +27,7 @@ struct FeaturesToolbar<CameraModel: Camera>: PlatformView {
         // Hide the toolbar items when a person interacts with capture controls.
         .opacity(camera.prefersMinimizedControlsUI ? 0 : 1)
     }
-    
+
     //  A button to toggle the enabled state of Live Photo capture.
     var livePhotoButton: some View {
         Button {
@@ -36,7 +36,7 @@ struct FeaturesToolbar<CameraModel: Camera>: PlatformView {
             Image(systemName: camera.isLivePhotoEnabled ? "livephoto" : "livephoto.slash")
         }
     }
-    
+
     @ViewBuilder
     var prioritizePicker: some View {
         Menu {
@@ -69,7 +69,7 @@ struct FeaturesToolbar<CameraModel: Camera>: PlatformView {
                 .buttonBorderShape(.capsule)
         }
     }
-    
+
     var hdrToggleButton: some View {
         Button {
             camera.isHDRVideoEnabled.toggle()
@@ -79,7 +79,7 @@ struct FeaturesToolbar<CameraModel: Camera>: PlatformView {
         }
         .disabled(camera.captureActivity.isRecording)
     }
-    
+
     @ViewBuilder
     var compactSpacer: some View {
         if !isRegularSize {

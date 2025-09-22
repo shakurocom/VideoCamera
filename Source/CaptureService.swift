@@ -723,7 +723,7 @@ extension CaptureService: AVCaptureVideoDataOutputSampleBufferDelegate {
 
 }
 
-// MARK - CaptureControlsDelegate
+// MARK: - CaptureControlsDelegate
 
 private class CaptureControlsDelegate: NSObject, AVCaptureSessionControlsDelegate {
 

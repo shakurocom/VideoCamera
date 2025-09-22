@@ -1,10 +1,3 @@
-/*
-See the LICENSE.txt file for this sample’s licensing information.
-
-Abstract:
-A view that displays the current recording time.
-*/
-
 import SwiftUI
 import VideoCamera_Framework
 
@@ -13,9 +6,9 @@ struct RecordingTimeView: PlatformView {
 
     @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    
+
     let time: TimeInterval
-    
+
     var body: some View {
         Text(time.formatted)
             .padding([.leading, .trailing], 12)

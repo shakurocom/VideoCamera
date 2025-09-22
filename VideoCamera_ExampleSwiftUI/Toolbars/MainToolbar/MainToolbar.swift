@@ -7,19 +7,19 @@ struct MainToolbar<CameraModel: Camera>: PlatformView {
 
     @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    
+
     @StateObject var camera: CameraModel
-    
+
     var body: some View {
         HStack {
-			ThumbnailButton(camera: camera)
-                // Hide the thumbnail button when a person interacts with capture controls.
+            ThumbnailButton(camera: camera)
+            // Hide the thumbnail button when a person interacts with capture controls.
                 .opacity(camera.prefersMinimizedControlsUI ? 0 : 1)
             Spacer()
             CaptureButton(camera: camera)
             Spacer()
             SwitchCameraButton(camera: camera)
-                // Hide the camera selection when a person interacts with capture controls.
+            // Hide the camera selection when a person interacts with capture controls.
                 .opacity(camera.prefersMinimizedControlsUI ? 0 : 1)
         }
         .foregroundColor(.white)
@@ -27,7 +27,7 @@ struct MainToolbar<CameraModel: Camera>: PlatformView {
         .frame(width: width, height: height)
         .padding([.leading, .trailing])
     }
-    
+
     var width: CGFloat? { isRegularSize ? 250 : nil }
     var height: CGFloat? { 80 }
 }
