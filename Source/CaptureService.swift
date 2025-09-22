@@ -157,6 +157,27 @@ final class CaptureService: NSObject {
         }
     }
 
+    func torchMode() -> AVCaptureDevice.TorchMode {
+        if hasTorch, let device = currentDevice() {
+            return device.torchMode
+        } else {
+            return AVCaptureDevice.TorchMode.off
+        }
+    }
+
+    func setTorchMode(_ mode: AVCaptureDevice.TorchMode) throws {
+        guard hasTorch, let device = currentDevice() else {
+            return
+        }
+        if device.isTorchModeSupported(mode) {
+            try device.lockForConfiguration()
+            device.torchMode = mode
+            device.unlockForConfiguration()
+        } else {
+            throw VideoCameraError.torchModeUnsupported(requestedMode: mode)
+        }
+    }
+
     // MARK: - Initialization
 
     @MainActor
@@ -184,7 +205,7 @@ final class CaptureService: NSObject {
         guard await isAuthorized, !captureSession.isRunning else { // TODO: implement - isAuthorized
             return
         }
-        try setupSession()
+        try setupSession() // TODO: implement - split  setupSession and captureSession.startRunning()
         captureSession.startRunning()
     }
 

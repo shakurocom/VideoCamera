@@ -61,7 +61,7 @@ class ExampleVideoCameraViewController: UIViewController {
         super.viewWillAppear(animated)
         if isNewCameraShown {
             Task(operation: {
-                await cameraModel?.start()
+                try? await cameraModel?.start()
             })
         } else {
             camera?.startSession()

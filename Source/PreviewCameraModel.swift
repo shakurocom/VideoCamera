@@ -46,7 +46,7 @@ public class PreviewCameraModel: ObservableObject, Camera {
         }
     }
 
-    func stopSession() async {
+    public func stopSession() async {
         if status == .running {
             status = .unknown
         }

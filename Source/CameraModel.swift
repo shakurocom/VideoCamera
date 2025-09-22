@@ -102,6 +102,14 @@ public final class CameraModel: ObservableObject, Camera {
         try await captureService.setSmoothAutoFocusEnabled(enabled)
     }
 
+    public func torchMode() async -> AVCaptureDevice.TorchMode {
+        return await captureService.torchMode()
+    }
+
+    public func setTorchMode(_ mode: AVCaptureDevice.TorchMode) async throws {
+        try await captureService.setTorchMode(mode)
+    }
+
     public func start() async throws {
         guard await captureService.isAuthorized else { // TODO: implement
             status = .unauthorized
