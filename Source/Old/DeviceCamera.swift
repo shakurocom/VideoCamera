@@ -13,7 +13,6 @@ internal final class DeviceCamera: NSObject, @unchecked Sendable {
         case notInitialized
         case initialized
         case initializationError
-        case waitingForAuthorization
     }
 
     // delayed init
@@ -85,7 +84,7 @@ internal final class DeviceCamera: NSObject, @unchecked Sendable {
     // MARK: - Private
 
     private func authorizedSetup() {
-        guard (cameraDeviceInitializationStatus == .notInitialized) || (cameraDeviceInitializationStatus == .waitingForAuthorization) else {
+        guard cameraDeviceInitializationStatus == .notInitialized else {
             return
         }
 
@@ -191,9 +190,10 @@ internal final class DeviceCamera: NSObject, @unchecked Sendable {
                 }
                 useDeviceOrientationListener = configuration.usePreciseOrientationDetectionMethod
                 if useDeviceOrientationListener {
-                    // TODO: implement
-//                    deviceOrientationListener = DeviceOrientationListener()
-//                    deviceOrientationListener?.beginListeningDeviceOrientation()
+                    Task(operation: { @MainActor in
+                        deviceOrientationListener = DeviceOrientationListener()
+                        deviceOrientationListener?.beginListeningDeviceOrientation()
+                    })
                 }
             }
 
@@ -238,7 +238,7 @@ internal final class DeviceCamera: NSObject, @unchecked Sendable {
             cameraDeviceInitializationStatus = .initialized
             if cameraShouldStartSessionAfterInitialization {
                 cameraShouldStartSessionAfterInitialization = false
-//                startSession() // TODO: implement
+                startSession()
             }
             delegate?.videoCameraInitialized(self, errors: nonCriticalErrors)
         } else {
@@ -668,10 +668,6 @@ extension DeviceCamera: VideoCamera {
                 self.cameraShouldStartSessionAfterInitialization = true
                 return
 
-            case .waitingForAuthorization:
-                self.cameraShouldStartSessionAfterInitialization = true
-                self.authorizedSetup()
-
             case .initialized:
                 if let session = self.captureSession, !session.isRunning {
                     Task(operation: { @MainActor in
@@ -686,8 +682,7 @@ extension DeviceCamera: VideoCamera {
         workQueue.async(execute: {
             switch self.cameraDeviceInitializationStatus {
 
-            case .notInitialized,
-                 .waitingForAuthorization:
+            case .notInitialized:
                 self.cameraShouldStartSessionAfterInitialization = false
 
             case .initialized:

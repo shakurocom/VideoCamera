@@ -100,6 +100,7 @@ final class CaptureService: NSObject {
     private var controlsMap: [String: [Any]] = [:] // device identifier : capture control (AVCaptureControl)
     private var controlsDelegate = CaptureControlsDelegate() // object that responds to capture control activation and presentation events
     private var subjectAreaChangeTask: Task<Void, Never>?
+    private var observeTasks: [Task<Void, Never>] = []
 
     private var videoDataOutput: AVCaptureVideoDataOutput?
     private var videoDataOutputQueue: DispatchQueue?
@@ -119,7 +120,7 @@ final class CaptureService: NSObject {
         return captureSessionContainer.captureSession
     }
 
-    var isAuthorized: Bool { // TODO: implement
+    var isAuthorized: Bool {
         get async {
             let status = AVCaptureDevice.authorizationStatus(for: .video)
             var isAuthorized = status == .authorized
@@ -197,6 +198,8 @@ final class CaptureService: NSObject {
 
     deinit {
         didOutputSampleBufferContinuation.finish()
+        subjectAreaChangeTask?.cancel()
+        observeTasks.forEach({ $0.cancel() })
     }
 
     // MARK: - Public
@@ -207,7 +210,7 @@ final class CaptureService: NSObject {
         guard await isAuthorized, !captureSession.isRunning else { // TODO: implement - isAuthorized
             return
         }
-        try setupSession() // TODO: implement - split  setupSession and captureSession.startRunning()
+        try setupSessionIfNotConfigured() // TODO: implement - split  setupSession and captureSession.startRunning()
         captureSession.startRunning()
     }
 
@@ -369,7 +372,7 @@ final class CaptureService: NSObject {
 
     // MARK: - Private
 
-    private func setupSession() throws {
+    private func setupSessionIfNotConfigured() throws {
         guard !isSessionConfigured else {
             return
         }
@@ -520,13 +523,13 @@ final class CaptureService: NSObject {
     private func observeSubjectAreaChanges(of device: AVCaptureDevice) {
         // TODO: implement - disable in options???
         subjectAreaChangeTask?.cancel()
-        subjectAreaChangeTask = Task {
+        subjectAreaChangeTask = Task(operation: { [weak self] in
             for await _ in NotificationCenter.default.notifications(named: AVCaptureDevice.subjectAreaDidChangeNotification,
                                                                     object: device).compactMap({ _ in true }) {
                 // perform a system-initiated focus and expose
-                try? focusAndExpose(at: CGPoint(x: 0.5, y: 0.5), isUserInitiated: false)
+                try? self?.focusAndExpose(at: CGPoint(x: 0.5, y: 0.5), isUserInitiated: false)
             }
-        }
+        })
     }
 
     private func focusAndExpose(at devicePoint: CGPoint, isUserInitiated: Bool) throws {
@@ -587,14 +590,14 @@ final class CaptureService: NSObject {
     /// system-preferred camera (SPC) selection to this new device. When this occurs, if the SPC
     /// isn't the currently selected camera, switch to the new device.
     private func monitorSystemPreferredCamera() {
-        Task(operation: {
+        observeTasks.append(Task(operation: { [weak self] in
             for await camera in systemPreferredCamera.changes {
                 if let camera, currentDevice() != camera {
                     CaptureService.logger.debug("Switching camera selection to the system-preferred camera.")
                     changeCaptureDevice(to: camera)
                 }
             }
-        })
+        }))
     }
 
     @available(iOS 17.0, *)
@@ -606,13 +609,13 @@ final class CaptureService: NSObject {
         rotationObservers.append(
             coordinator.observe(\.videoRotationAngleForHorizonLevelPreview, options: .new) { [weak self] _, change in
                 guard let self, let angle = change.newValue else { return }
-                Task { await self.updatePreviewRotation(angle) }
+                Task(operation: { await self.updatePreviewRotation(angle) })
             }
         )
         rotationObservers.append(
             coordinator.observe(\.videoRotationAngleForHorizonLevelCapture, options: .new) { [weak self] _, change in
                 guard let self, let angle = change.newValue else { return }
-                Task { await self.updateCaptureRotation(angle) }
+                Task(operation: { await self.updateCaptureRotation(angle) })
             }
         )
         rotationCoordinator = coordinator
@@ -675,21 +678,21 @@ final class CaptureService: NSObject {
     }
 
     private func observeNotifications() {
-        Task(operation: {
+        observeTasks.append(Task(operation: { [weak self] in
             for await reason in NotificationCenter.default.notifications(named: AVCaptureSession.wasInterruptedNotification)
                 .compactMap({ $0.userInfo?[AVCaptureSessionInterruptionReasonKey] as AnyObject? })
                 .compactMap({ AVCaptureSession.InterruptionReason(rawValue: $0.integerValue) }) {
                 isInterrupted = [.audioDeviceInUseByAnotherClient, .videoDeviceInUseByAnotherClient].contains(reason)
             }
-        })
+        }))
 
-        Task(operation: {
+        observeTasks.append(Task(operation: { [weak self] in
             for await _ in NotificationCenter.default.notifications(named: AVCaptureSession.interruptionEndedNotification) {
                 isInterrupted = false
             }
-        })
+        }))
 
-        Task(operation: {
+        observeTasks.append(Task(operation: { [weak self] in
             for await error in NotificationCenter.default.notifications(named: AVCaptureSession.runtimeErrorNotification)
                 .compactMap({ $0.userInfo?[AVCaptureSessionErrorKey] as? AVError }) {
                 // if the system resets media services, the capture session stops running
@@ -700,7 +703,7 @@ final class CaptureService: NSObject {
                     captureSession.startRunning()
                 }
             }
-        })
+        }))
     }
 }
 
@@ -710,7 +713,7 @@ extension CaptureService: AVCaptureVideoDataOutputSampleBufferDelegate {
 
     nonisolated func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         let sampleBufferUncheckedSendable: CMSampleBufferUncheckedSendable = CMSampleBufferUncheckedSendable(buffer: sampleBuffer)
-        Task(operation: { @CaptureServiceActor in
+        Task(operation: { @CaptureServiceActor [weak self] in
             didOutputSampleBufferContinuation.yield(sampleBufferUncheckedSendable)
         })
     }

@@ -44,9 +44,9 @@ public final class CameraModel: ObservableObject, Camera {
     @Published public var isHDRVideoEnabled = false { // indicates whether camera enables HDR video recording
         didSet {
             guard status == .running, captureMode == .video else { return }
-            Task {
+            Task(operation: {
                 await captureService.setHDRVideoEnabled(isHDRVideoEnabled)
-            }
+            })
         }
     }
 
@@ -68,6 +68,8 @@ public final class CameraModel: ObservableObject, Camera {
     @Published private var captureMode: CaptureMode?
     @Published private var isVideoHDREnabled = true
     @Published private var isVideoHDRSupported = true
+
+    private var observeTasks: [Task<Void, Never>] = []
 
     public var didOutputSampleBuffer: AsyncStream<CMSampleBufferUncheckedSendable> {
         return captureService.didOutputSampleBuffer
@@ -94,6 +96,10 @@ public final class CameraModel: ObservableObject, Camera {
         ))
         self.mediaLibrary = options.captureModes.isEmpty ? nil : MediaLibrary()
         self.captureMode = options.captureModes.first
+    }
+
+    deinit {
+        observeTasks.forEach({ $0.cancel() })
     }
 
     // MARK: - Public
@@ -206,7 +212,7 @@ public final class CameraModel: ObservableObject, Camera {
 private extension CameraModel {
 
     private func startObserving() {
-        Task(operation: { [weak self] in
+        observeTasks.append(Task(operation: { [weak self] in
             guard let mediaLibraryActual = self?.mediaLibrary else {
                 return
             }
@@ -216,8 +222,8 @@ private extension CameraModel {
                     self?.thumbnail = thumbnail
                 }
             }
-        })
-        Task(operation: { [weak self] in
+        }))
+        observeTasks.append(Task(operation: { [weak self] in
             guard let captureServiceActual = self?.captureService else {
                 return
             }
@@ -230,8 +236,8 @@ private extension CameraModel {
                     self?.captureActivity = activity
                 }
             }
-        })
-        Task(operation: { [weak self] in
+        }))
+        observeTasks.append(Task(operation: { [weak self] in
             guard let captureServiceActual = self?.captureService else {
                 return
             }
@@ -243,8 +249,8 @@ private extension CameraModel {
                 self?.isHDRVideoSupported = capabilitiesActual.isHDRSupported
                 self?.isVideoHDRSupported = capabilitiesActual.isHDRSupported
             }
-        })
-        Task(operation: { [weak self] in
+        }))
+        observeTasks.append(Task(operation: { [weak self] in
             guard let captureServiceActual = self?.captureService else {
                 return
             }
@@ -255,7 +261,7 @@ private extension CameraModel {
                     self?.prefersMinimizedControlsUI = isShowingFullscreenControls
                 }
             }
-        })
+        }))
     }
 
     private func flashScreen() {
