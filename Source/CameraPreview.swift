@@ -41,7 +41,6 @@ public class PreviewView: UIView, PreviewTarget {
         fatalError("init(coder:) has not been implemented")
     }
 
-    // Use the preview layer as the view's backing layer.
     public override class var layerClass: AnyClass {
         AVCaptureVideoPreviewLayer.self
     }
@@ -54,11 +53,15 @@ public class PreviewView: UIView, PreviewTarget {
     }
 
     public nonisolated func setSession(_ session: AVCaptureSession) {
-        // Connects the session with the preview layer, which allows the layer
-        // to provide a live view of the captured content.
-        Task { @MainActor in
+        Task(operation: { @MainActor in
             previewLayer.session = session
-        }
+        })
+    }
+
+    public nonisolated func setVideoGravity(_ videoGravity: AVLayerVideoGravity) {
+        Task(operation: { @MainActor in
+            previewLayer.videoGravity = videoGravity
+        })
     }
 
 }
@@ -79,18 +82,22 @@ public protocol PreviewSource: Sendable {
 public protocol PreviewTarget {
     // Sets the capture session on the destination.
     func setSession(_ session: AVCaptureSession)
+    func setVideoGravity(_ videoGravity: AVLayerVideoGravity)
 }
 
 /// The app's default `PreviewSource` implementation.
 struct DefaultPreviewSource: PreviewSource {
 
     private let session: AVCaptureSession
+    private let videoGravity: AVLayerVideoGravity
 
-    init(session: AVCaptureSession) {
+    init(session: AVCaptureSession, videoGravity: AVLayerVideoGravity) {
         self.session = session
+        self.videoGravity = videoGravity
     }
 
     func connect(to target: PreviewTarget) {
         target.setSession(session)
+        target.setVideoGravity(videoGravity)
     }
 }

@@ -8,6 +8,7 @@ public final class CameraModel: ObservableObject, Camera {
 
         public let isAudioAllowed: Bool
         public let captureModes: [CaptureMode]
+        public let videoGravity: AVLayerVideoGravity = .resizeAspect
 
         let isVideoFeedEnabled: Bool
         let isVideoFeedShouldDiscardLateFrames: Bool
@@ -80,6 +81,7 @@ public final class CameraModel: ObservableObject, Camera {
         self.captureService = CaptureService(options: CaptureService.Options(
             isAudioAllowed: options.isAudioAllowed,
             captureModes: options.captureModes,
+            videoGravity: options.videoGravity,
             isVideoFeedEnabled: options.isVideoFeedEnabled,
             isVideoFeedShouldDiscardLateFrames: options.isVideoFeedShouldDiscardLateFrames,
             videoFeedSettings: options.videoFeedSettings

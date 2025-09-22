@@ -52,6 +52,7 @@ final class CaptureService: NSObject {
 
         let isAudioAllowed: Bool
         let captureModes: [CaptureMode]
+        let videoGravity: AVLayerVideoGravity
 
         let isVideoFeedEnabled: Bool
         let isVideoFeedShouldDiscardLateFrames: Bool
@@ -185,7 +186,7 @@ final class CaptureService: NSObject {
         self.options = options
         let session = AVCaptureSession()
         self.captureSessionContainer = CaptureSessionContainer(captureSession: session)
-        self.previewSource = DefaultPreviewSource(session: session)
+        self.previewSource = DefaultPreviewSource(session: session, videoGravity: options.videoGravity)
         self.photoCapture = options.captureModes.contains(.photo) ? PhotoCapture() : nil
         self.movieCapture = options.captureModes.contains(.video) ? MovieCapture() : nil
         let (didOutputSampleBuffer, didOutputSampleBufferContinuation) = AsyncStream.makeStream(of: CMSampleBufferUncheckedSendable.self)
