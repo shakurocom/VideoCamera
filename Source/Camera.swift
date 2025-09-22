@@ -17,7 +17,8 @@ public protocol Camera: AnyObject, SendableMetatype, ObservableObject {
     var thumbnail: CGImage? { get } // thumbnail image for the most recent photo or video capture.
     var error: Error? { get } // error if the camera encountered a problem
 
-    func start() async
+    func start() async throws
+    func stopSession() async
     func setCaptureMode(_ captureMode: CaptureMode)
     func switchVideoDevices() async
     func focusAndExpose(at point: CGPoint) async // func performs a one-time automatic focus and exposure operation

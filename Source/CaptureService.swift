@@ -188,6 +188,13 @@ final class CaptureService: NSObject {
         captureSession.startRunning()
     }
 
+    func stopSession() {
+        guard captureSession.isRunning else {
+            return
+        }
+        captureSession.stopRunning()
+    }
+
     func setCaptureMode(_ captureMode: CaptureMode) throws {
         guard options.captureModes.contains(captureMode) else {
             return
@@ -241,6 +248,13 @@ final class CaptureService: NSObject {
         if #available(iOS 17.0, *) {
             AVCaptureDevice.userPreferredCamera = nextDevice
         }
+    }
+
+    func setVideoPreviewPaused(_ paused: Bool) {
+        let connection = videoPreviewLayer.connection
+        Task(operation: { @MainActor in
+            connection?.isEnabled = !paused
+        })
     }
 
     /// performs a one-time automatic focus and expose operation when person tapping on the preview area.

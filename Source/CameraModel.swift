@@ -102,19 +102,25 @@ public final class CameraModel: ObservableObject, Camera {
         try await captureService.setSmoothAutoFocusEnabled(enabled)
     }
 
-    public func start() async {
+    public func start() async throws {
         guard await captureService.isAuthorized else { // TODO: implement
             status = .unauthorized
             return
         }
         do {
             try await captureService.start(newCaptureMode: captureMode, isVideoHDREnabledNew: isVideoHDREnabled)
-            startObserving()
+            startObserving() // TODO: implement - move to startSession + stopObserving ?
             status = .running
         } catch {
             CaptureService.logger.error("Failed to start capture service. \(error)")
             status = .failed
+            throw error
         }
+    }
+
+    public func stopSession() async {
+        await captureService.stopSession()
+        status = .unknown
     }
 
     public func setCaptureMode(_ captureMode: CaptureMode) {
@@ -133,6 +139,10 @@ public final class CameraModel: ObservableObject, Camera {
         isSwitchingVideoDevices = true
         defer { isSwitchingVideoDevices = false }
         await captureService.selectNextVideoDevice()
+    }
+
+    public func setVideoPreviewPaused(_ paused: Bool) async {
+        await captureService.setVideoPreviewPaused(paused)
     }
 
     public func focusAndExpose(at point: CGPoint) async { // func performs a one-time automatic focus and exposure operation

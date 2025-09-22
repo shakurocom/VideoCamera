@@ -40,9 +40,15 @@ public class PreviewCameraModel: ObservableObject, Camera {
 
     // MARK: - Public
 
-    public func start() async {
+    public func start() async throws {
         if status == .unknown {
             status = .running
+        }
+    }
+
+    func stopSession() async {
+        if status == .running {
+            status = .unknown
         }
     }
 
