@@ -129,7 +129,7 @@ public enum QualityPrioritization: Int, Identifiable, CaseIterable, CustomString
 
 }
 
-enum CameraError: Error {
+public enum CameraError: Error {
     case videoDeviceUnavailable
     case audioDeviceUnavailable
     case addInputFailed
