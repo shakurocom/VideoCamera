@@ -52,8 +52,12 @@ final class CaptureService: NSObject {
 
         let isAudioAllowed: Bool
         let captureModes: [CaptureMode]
+        let cameraPosition: AVCaptureDevice.Position
         let videoGravity: AVLayerVideoGravity
         let captureSessionPreset: AVCaptureSession.Preset?
+        let isIOS18ControlsEnabled: Bool
+        let isIOS17RotationCoordinatorEnabled: Bool
+        let isSubjectAreaObserverEnabled: Bool
 
         let isVideoFeedEnabled: Bool
         let isVideoFeedShouldDiscardLateFrames: Bool
@@ -207,10 +211,10 @@ final class CaptureService: NSObject {
     func start(newCaptureMode: CaptureMode?, isVideoHDREnabledNew: Bool) async throws {
         captureMode = newCaptureMode
         isHDRVideoEnabled = isVideoHDREnabledNew
-        guard await isAuthorized, !captureSession.isRunning else { // TODO: implement - isAuthorized
+        guard await isAuthorized, !captureSession.isRunning else {
             return
         }
-        try setupSessionIfNotConfigured() // TODO: implement - split  setupSession and captureSession.startRunning()
+        try setupSessionIfNotConfigured()
         captureSession.startRunning()
     }
 
@@ -382,8 +386,7 @@ final class CaptureService: NSObject {
         observeCaptureControlsState()
 
         do {
-            // TODO: implement - add position: AVCaptureDevice.Position to configuration
-            guard let defaultCamera = deviceLookup.getCamera(position: .back) else {
+            guard let defaultCamera = deviceLookup.getCamera(position: options.cameraPosition) else {
                 throw CameraError.videoDeviceUnavailable
             }
 
@@ -427,17 +430,17 @@ final class CaptureService: NSObject {
                 try addOutput(output)
                 videoDataOutput = output
             }
-            if #available(iOS 18.0, *) {
-                configureControls(for: defaultCamera) // TODO: implement
+            if #available(iOS 18.0, *), options.isIOS18ControlsEnabled {
+                configureControls(for: defaultCamera)
+            }
+            if #available(iOS 17.0, *), options.isIOS17RotationCoordinatorEnabled {
+                createRotationCoordinator(for: defaultCamera)
             }
             monitorSystemPreferredCamera()
-            if #available(iOS 17.0, *) {
-                createRotationCoordinator(for: defaultCamera) // TODO: implement
-            } else {
-                // TODO: implement
+            if options.isSubjectAreaObserverEnabled {
+                observeSubjectAreaChanges(of: defaultCamera)
             }
-            observeSubjectAreaChanges(of: defaultCamera) // TODO: implement
-            updateCaptureCapabilities() // TODO: implement
+            updateCaptureCapabilities()
 
             isSessionConfigured = true
         } catch {
@@ -519,9 +522,7 @@ final class CaptureService: NSObject {
         return controls
     }
 
-    // Observe notifications of type `subjectAreaDidChangeNotification` for the specified device.
     private func observeSubjectAreaChanges(of device: AVCaptureDevice) {
-        // TODO: implement - disable in options???
         subjectAreaChangeTask?.cancel()
         subjectAreaChangeTask = Task(operation: { [weak self] in
             for await _ in NotificationCenter.default.notifications(named: AVCaptureDevice.subjectAreaDidChangeNotification,
@@ -566,25 +567,21 @@ final class CaptureService: NSObject {
         captureSession.removeInput(currentInput)
         do {
             activeVideoInput = try addInput(for: device)
-            if #available(iOS 18.0, *) {
+            if #available(iOS 18.0, *), options.isIOS18ControlsEnabled {
                 configureControls(for: device)
-            } else {
-                // TODO: implement
             }
-            if #available(iOS 17.0, *) {
+            if #available(iOS 17.0, *), options.isIOS17RotationCoordinatorEnabled {
                 createRotationCoordinator(for: device)
-            } else {
-                // TODO: implement
             }
-            observeSubjectAreaChanges(of: device)
+            if options.isSubjectAreaObserverEnabled {
+                observeSubjectAreaChanges(of: device)
+            }
             updateCaptureCapabilities()
         } catch {
             captureSession.addInput(currentInput)
         }
     }
 
-    /// Monitors changes to the system's preferred camera selection.
-    ///
     /// iPadOS supports external cameras. When someone connects an external camera to their iPad,
     /// they're signaling the intent to use the device. The system responds by updating the
     /// system-preferred camera (SPC) selection to this new device. When this occurs, if the SPC
@@ -644,7 +641,7 @@ final class CaptureService: NSObject {
         return previewLayer
     }
 
-    /// When the capture session changes, such as changing modes or input devices, the service
+    /// when the capture session changes, such as changing modes or input devices, the service
     /// calls this method to update its configuration and capabilities. The app uses this state to
     /// determine which features to enable in the user interface.
     private func updateCaptureCapabilities() {

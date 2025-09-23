@@ -8,8 +8,12 @@ public final class CameraModel: ObservableObject, Camera {
 
         public let isAudioAllowed: Bool
         public let captureModes: [CaptureMode]
+        public let cameraPosition: AVCaptureDevice.Position
         public let videoGravity: AVLayerVideoGravity
         public let captureSessionPreset: AVCaptureSession.Preset?
+        public let isIOS18ControlsEnabled: Bool
+        public let isIOS17RotationCoordinatorEnabled: Bool
+        public let isSubjectAreaObserverEnabled: Bool
 
         let isVideoFeedEnabled: Bool
         let isVideoFeedShouldDiscardLateFrames: Bool
@@ -17,15 +21,23 @@ public final class CameraModel: ObservableObject, Camera {
 
         public init(isAudioAllowed: Bool = false,
                     captureModes: [CaptureMode] = [],
+                    cameraPosition: AVCaptureDevice.Position = AVCaptureDevice.Position.back,
                     videoGravity: AVLayerVideoGravity = .resizeAspect,
                     captureSessionPreset: AVCaptureSession.Preset? = nil,
+                    isIOS18ControlsEnabled: Bool = false,
+                    isIOS17RotationCoordinatorEnabled: Bool = false,
+                    isSubjectAreaObserverEnabled: Bool = false,
                     isVideoFeedEnabled: Bool = false,
                     isVideoFeedShouldDiscardLateFrames: Bool = true,
                     videoFeedSettings: [String: any Sendable] = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]) {
             self.isAudioAllowed = isAudioAllowed
             self.captureModes = captureModes
+            self.cameraPosition = cameraPosition
             self.videoGravity = videoGravity
             self.captureSessionPreset = captureSessionPreset
+            self.isIOS18ControlsEnabled = isIOS18ControlsEnabled
+            self.isIOS17RotationCoordinatorEnabled = isIOS17RotationCoordinatorEnabled
+            self.isSubjectAreaObserverEnabled = isSubjectAreaObserverEnabled
             self.isVideoFeedEnabled = isVideoFeedEnabled
             self.isVideoFeedShouldDiscardLateFrames = isVideoFeedShouldDiscardLateFrames
             self.videoFeedSettings = videoFeedSettings
@@ -88,8 +100,12 @@ public final class CameraModel: ObservableObject, Camera {
         self.captureService = CaptureService(options: CaptureService.Options(
             isAudioAllowed: options.isAudioAllowed,
             captureModes: options.captureModes,
+            cameraPosition: options.cameraPosition,
             videoGravity: options.videoGravity,
             captureSessionPreset: options.captureSessionPreset,
+            isIOS18ControlsEnabled: options.isIOS18ControlsEnabled,
+            isIOS17RotationCoordinatorEnabled: options.isIOS17RotationCoordinatorEnabled,
+            isSubjectAreaObserverEnabled: options.isSubjectAreaObserverEnabled,
             isVideoFeedEnabled: options.isVideoFeedEnabled,
             isVideoFeedShouldDiscardLateFrames: options.isVideoFeedShouldDiscardLateFrames,
             videoFeedSettings: options.videoFeedSettings
@@ -125,13 +141,13 @@ public final class CameraModel: ObservableObject, Camera {
     }
 
     public func start() async throws {
-        guard await captureService.isAuthorized else { // TODO: implement
+        guard await captureService.isAuthorized else {
             status = .unauthorized
             return
         }
         do {
             try await captureService.start(newCaptureMode: captureMode, isVideoHDREnabledNew: isVideoHDREnabled)
-            startObserving() // TODO: implement - move to startSession + stopObserving ?
+            startObserving()
             status = .running
         } catch {
             CaptureService.logger.error("Failed to start capture service. \(error)")
