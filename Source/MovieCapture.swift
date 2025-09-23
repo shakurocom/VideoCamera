@@ -4,6 +4,10 @@ import Combine
 @CaptureServiceActor
 final class MovieCapture: OutputService {
 
+    struct Movie: Sendable {
+        let url: URL
+    }
+
     let didUpdateCaptureActivity: AsyncStream<CaptureActivity>
 
     private(set) var captureActivity: CaptureActivity = .idle
@@ -17,8 +21,8 @@ final class MovieCapture: OutputService {
     private var timerCancellable: AnyCancellable?
     private var isHDRSupported = false
 
-    var capabilities: CaptureCapabilities? {
-        return CaptureCapabilities(isHDRSupported: isHDRSupported)
+    var capabilities: CaptureService.CaptureCapabilities? {
+        return CaptureService.CaptureCapabilities(isHDRSupported: isHDRSupported)
     }
 
     // MARK: - Initialization

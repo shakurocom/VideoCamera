@@ -38,6 +38,8 @@ struct CaptureButton<CameraModel: Camera>: View {
                     await camera.toggleRecording()
                 }
             }
+        case .none:
+            Color.clear
         }
     }
 }

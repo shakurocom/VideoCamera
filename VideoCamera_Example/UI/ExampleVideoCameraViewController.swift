@@ -71,7 +71,9 @@ class ExampleVideoCameraViewController: UIViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         if isNewCameraShown {
-            // TODO: implement
+            Task(operation: {
+                await cameraModel?.stopSession()
+            })
         } else {
             camera?.stopSession()
         }

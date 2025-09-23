@@ -23,7 +23,7 @@ struct CameraView<CameraModel: Camera>: PlatformView {
                     // Handle capture events from device hardware buttons.
                     .onCameraCaptureEvent(defaultSoundDisabled: true) { event in
                         if event.phase == .ended {
-                            let sound: AVCaptureEventSound
+                            let sound: AVCaptureEventSound?
                             switch camera.captureMode {
                             case .photo:
                                 sound = .cameraShutter
@@ -34,10 +34,12 @@ struct CameraView<CameraModel: Camera>: PlatformView {
                                     .endVideoRecording : .beginVideoRecording
                                 // Toggle video recording when pressing a hardware button.
                                 await camera.toggleRecording()
+                            case .none:
+                                sound = nil
                             }
                             // Play a sound when capturing by clicking an AirPods stem.
-                            if event.shouldPlaySound {
-                                event.play(sound)
+                            if let soundActual = sound, event.shouldPlaySound {
+                                event.play(soundActual)
                             }
                         }
                     }

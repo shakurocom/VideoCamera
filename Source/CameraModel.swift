@@ -62,6 +62,7 @@ public final class CameraModel: ObservableObject, Camera {
         }
     }
 
+    @Published public var captureMode: CaptureMode?
     // value indicates how to balance the photo capture quality versus speed
     @Published public var qualityPrioritization = QualityPrioritization.quality
     @Published public private(set) var shouldFlashScreen = false // indicates whether to show visual feedback when capture begins
@@ -77,7 +78,6 @@ public final class CameraModel: ObservableObject, Camera {
     private let captureService: CaptureService
     private let mediaLibrary: MediaLibrary?
 
-    @Published private var captureMode: CaptureMode?
     @Published private var isVideoHDREnabled = true
     @Published private var isVideoHDRSupported = true
 
@@ -196,7 +196,7 @@ public final class CameraModel: ObservableObject, Camera {
             return
         }
         do {
-            let photoFeatures = PhotoFeatures(isLivePhotoEnabled: isLivePhotoEnabled, qualityPrioritization: qualityPrioritization)
+            let photoFeatures = PhotoCapture.PhotoFeatures(isLivePhotoEnabled: isLivePhotoEnabled, qualityPrioritization: qualityPrioritization)
             let photo = try await captureService.capturePhoto(with: photoFeatures)
             try await mediaLibraryActual.save(photo: photo)
         } catch {

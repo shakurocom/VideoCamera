@@ -15,7 +15,7 @@ struct CaptureModeView<CameraModel: Camera>: View {
     var body: some View {
         Picker("Capture Mode", selection: $camera.captureMode) {
             ForEach(CaptureMode.allCases) {
-                Image(systemName: $0.systemName)
+                Image(systemName: captureModeImageSystemName(captureMode: $0))
                     .tag($0.rawValue)
             }
         }
@@ -24,7 +24,12 @@ struct CaptureModeView<CameraModel: Camera>: View {
         .disabled(camera.captureActivity.isRecording)
         .onChange(of: direction) { _, _ in
             let modes = CaptureMode.allCases
-            let selectedIndex = modes.firstIndex(of: camera.captureMode) ?? -1
+            let selectedIndex: Array<CaptureMode>.Index
+            if let captureMode = camera.captureMode {
+                selectedIndex = modes.firstIndex(of: captureMode) ?? -1
+            } else {
+                selectedIndex = -1
+            }
             // Increment the selected index when swiping right.
             let increment = direction == .right
             let newIndex = selectedIndex + (increment ? 1 : -1)
@@ -35,6 +40,16 @@ struct CaptureModeView<CameraModel: Camera>: View {
         // Hide the capture mode view when a person interacts with capture controls.
         .opacity(camera.prefersMinimizedControlsUI ? 0 : 1)
     }
+
+    private func captureModeImageSystemName(captureMode: CaptureMode) -> String {
+        switch captureMode {
+        case .photo:
+            "camera.fill"
+        case .video:
+            "video.fill"
+        }
+    }
+
 }
 
 #Preview {

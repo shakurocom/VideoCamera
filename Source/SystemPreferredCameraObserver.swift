@@ -1,6 +1,6 @@
 import AVFoundation
 
-/// An object that provides an asynchronous stream capture devices that represent the system-preferred camera.
+/// an object that provides an asynchronous stream capture devices that represent the system-preferred camera.
 class SystemPreferredCameraObserver: NSObject {
 
     private let systemPreferredKeyPath = "systemPreferredCamera"

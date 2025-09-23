@@ -65,6 +65,19 @@ final class CaptureService: NSObject {
 
     }
 
+    struct CaptureCapabilities {
+
+        let isLivePhotoCaptureSupported: Bool
+        let isHDRSupported: Bool
+
+        init(isLivePhotoCaptureSupported: Bool = false,
+             isHDRSupported: Bool = false) {
+            self.isLivePhotoCaptureSupported = isLivePhotoCaptureSupported
+            self.isHDRSupported = isHDRSupported
+        }
+
+    }
+
     private struct CaptureSessionContainer: Sendable {
         let captureSession: AVCaptureSession
     }
@@ -351,7 +364,7 @@ final class CaptureService: NSObject {
         device.unlockForConfiguration()
     }
 
-    func capturePhoto(with features: PhotoFeatures) async throws -> Photo {
+    func capturePhoto(with features: PhotoCapture.PhotoFeatures) async throws -> PhotoCapture.Photo {
         guard let photoCaptureActual = photoCapture else {
             throw CameraError.photoCaptureNotAllowed
         }
@@ -362,7 +375,7 @@ final class CaptureService: NSObject {
         movieCapture?.startRecording()
     }
 
-    func stopRecording() async throws -> Movie {
+    func stopRecording() async throws -> MovieCapture.Movie {
         guard let movieCaptureActual = movieCapture else {
             throw CameraError.movieCaptureNotAllowed
         }

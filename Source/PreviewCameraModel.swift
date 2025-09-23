@@ -9,7 +9,7 @@ public class PreviewCameraModel: ObservableObject, Camera {
 
     @Published public private(set) var status = CameraStatus.unknown
 
-    @Published public var captureMode = CaptureMode.photo { // photo video
+    @Published public var captureMode: CaptureMode? = CaptureMode.photo { // photo video
         didSet {
             isSwitchingModes = true
             Task {
@@ -36,7 +36,10 @@ public class PreviewCameraModel: ObservableObject, Camera {
 
     // MARK: - Initialization
 
-    public init() { }
+    public init(captureMode: CaptureMode = .photo, status: CameraStatus = .unknown) {
+        self.captureMode = captureMode
+        self.status = status
+    }
 
     // MARK: - Public
 

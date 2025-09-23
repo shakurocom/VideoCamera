@@ -27,6 +27,8 @@ struct CameraUI<CameraModel: Camera>: PlatformView {
             case .video:
                 RecordingTimeView(time: camera.captureActivity.currentTime)
                     .offset(y: isRegularSize ? 20 : 0)
+            case .none:
+                Color.clear
             }
         }
         .overlay {

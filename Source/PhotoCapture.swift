@@ -8,10 +8,21 @@ enum PhotoCaptureError: Error {
 @CaptureServiceActor
 final class PhotoCapture: OutputService {
 
+    struct Photo: Sendable {
+        let data: Data
+        let isProxy: Bool
+        let livePhotoMovieURL: URL?
+    }
+
+    struct PhotoFeatures {
+        let isLivePhotoEnabled: Bool
+        let qualityPrioritization: QualityPrioritization
+    }
+
     let didUpdateCaptureActivity: AsyncStream<CaptureActivity>
 
     private(set) var captureActivity: CaptureActivity = .idle
-    private(set) var capabilities: CaptureCapabilities?
+    private(set) var capabilities: CaptureService.CaptureCapabilities?
     let avCaptureOutput = AVCapturePhotoOutput()
 
     private let didUpdateCaptureActivityContinuation: AsyncStream<CaptureActivity>.Continuation
@@ -107,7 +118,7 @@ final class PhotoCapture: OutputService {
     }
 
     private func updateCapabilities(for device: AVCaptureDevice) {
-        capabilities = CaptureCapabilities(isLivePhotoCaptureSupported: photoOutput.isLivePhotoCaptureSupported)
+        capabilities = CaptureService.CaptureCapabilities(isLivePhotoCaptureSupported: photoOutput.isLivePhotoCaptureSupported)
     }
 
 }
@@ -179,7 +190,6 @@ extension PhotoCapture {
                 CaptureService.logger.debug("Error capturing deferred photo: \(error)")
                 return
             }
-            // capture the data for this photo
             photoData = deferredPhotoProxy?.fileDataRepresentation()
             isProxyPhoto = true
         }

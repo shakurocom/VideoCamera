@@ -25,7 +25,7 @@
 		A5E5933B2E72DE4D000C3DE5 /* ViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E5933A2E72DE4D000C3DE5 /* ViewExtensions.swift */; };
 		A5E593422E72DFBA000C3DE5 /* PreviewCameraModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E593412E72DFBA000C3DE5 /* PreviewCameraModel.swift */; };
 		B8A704A52E7048CA0028A33E /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704A42E7048CA0028A33E /* Camera.swift */; };
-		B8A704A72E7049130028A33E /* DataTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704A62E7049130028A33E /* DataTypes.swift */; };
+		B8A704A72E7049130028A33E /* OutputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704A62E7049130028A33E /* OutputService.swift */; };
 		B8A704A92E7049670028A33E /* CameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704A82E7049670028A33E /* CameraPreview.swift */; };
 		B8A704AB2E704A790028A33E /* CameraModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704AA2E704A790028A33E /* CameraModel.swift */; };
 		B8A704AF2E704C620028A33E /* MediaLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A704AE2E704C620028A33E /* MediaLibrary.swift */; };
@@ -64,7 +64,7 @@
 		A5E5933A2E72DE4D000C3DE5 /* ViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtensions.swift; sourceTree = "<group>"; };
 		A5E593412E72DFBA000C3DE5 /* PreviewCameraModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewCameraModel.swift; sourceTree = "<group>"; };
 		B8A704A42E7048CA0028A33E /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Camera.swift; sourceTree = "<group>"; };
-		B8A704A62E7049130028A33E /* DataTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTypes.swift; sourceTree = "<group>"; };
+		B8A704A62E7049130028A33E /* OutputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputService.swift; sourceTree = "<group>"; };
 		B8A704A82E7049670028A33E /* CameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreview.swift; sourceTree = "<group>"; };
 		B8A704AA2E704A790028A33E /* CameraModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModel.swift; sourceTree = "<group>"; };
 		B8A704AE2E704C620028A33E /* MediaLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaLibrary.swift; sourceTree = "<group>"; };
@@ -129,17 +129,17 @@
 				B8A704AA2E704A790028A33E /* CameraModel.swift */,
 				A5E593412E72DFBA000C3DE5 /* PreviewCameraModel.swift */,
 				A56546802E77E67700131AAF /* test_image.jpg */,
+				B8A704A82E7049670028A33E /* CameraPreview.swift */,
 				B8A704B02E704CAD0028A33E /* CaptureService.swift */,
+				B8A704A62E7049130028A33E /* OutputService.swift */,
 				B8A704B22E705F420028A33E /* MovieCapture.swift */,
 				B8A704B32E705F420028A33E /* PhotoCapture.swift */,
 				B8A704B62E705F550028A33E /* DeviceLookup.swift */,
 				B8A704B72E705F550028A33E /* SystemPreferredCameraObserver.swift */,
-				B8A704A62E7049130028A33E /* DataTypes.swift */,
 				B8A704AE2E704C620028A33E /* MediaLibrary.swift */,
 				B8A704BA2E705F870028A33E /* CaptureExtensions.swift */,
 				A5E5933A2E72DE4D000C3DE5 /* ViewExtensions.swift */,
 				B8A704BD2E7063BE0028A33E /* FoundationExtensions.swift */,
-				B8A704A82E7049670028A33E /* CameraPreview.swift */,
 				B8B88D1E2E6F090400A68A2D /* Old */,
 			);
 			path = Source;
@@ -302,7 +302,7 @@
 				17AC9F6A28AA771F00DF8A2B /* VideoCameraPreviewView.swift in Sources */,
 				17AC9F6528AA771F00DF8A2B /* VideoCameraConfiguration.swift in Sources */,
 				B8A704BB2E705F870028A33E /* CaptureExtensions.swift in Sources */,
-				B8A704A72E7049130028A33E /* DataTypes.swift in Sources */,
+				B8A704A72E7049130028A33E /* OutputService.swift in Sources */,
 				17AC9F6728AA771F00DF8A2B /* VideoCamera.swift in Sources */,
 				17AC9F6628AA771F00DF8A2B /* SimulatorCamera.swift in Sources */,
 				B8A704A52E7048CA0028A33E /* Camera.swift in Sources */,

@@ -2,10 +2,8 @@ import Foundation
 import Photos
 import UIKit
 
-/// An object that writes photos and movies to the user's Photos library.
 actor MediaLibrary {
 
-    // Errors that media library can throw.
     enum Error: Swift.Error {
         case unauthorized
         case saveFailed
@@ -15,14 +13,7 @@ actor MediaLibrary {
     let thumbnails: AsyncStream<CGImage?>
     private let continuation: AsyncStream<CGImage?>.Continuation?
 
-    /// Creates a new media library object.
-    init() {
-        let (thumbnails, continuation) = AsyncStream.makeStream(of: CGImage?.self)
-        self.thumbnails = thumbnails
-        self.continuation = continuation
-    }
-
-    // MARK: - Authorization
+    private let locationManager = CLLocationManager()
 
     private var isAuthorized: Bool {
         get async {
@@ -40,10 +31,19 @@ actor MediaLibrary {
         }
     }
 
-    // MARK: - Saving media
+    // MARK: - Initialization
+
+    /// Creates a new media library object.
+    init() {
+        let (thumbnails, continuation) = AsyncStream.makeStream(of: CGImage?.self)
+        self.thumbnails = thumbnails
+        self.continuation = continuation
+    }
+
+    // MARK: - Public
 
     /// Saves a photo to the Photos library.
-    func save(photo: Photo) async throws {
+    func save(photo: PhotoCapture.Photo) async throws {
         let location = try await currentLocation
         try await performChange {
             let creationRequest = PHAssetCreationRequest.forAsset()
@@ -70,7 +70,7 @@ actor MediaLibrary {
     }
 
     /// Saves a movie to the Photos library.
-    func save(movie: Movie) async throws {
+    func save(movie: MovieCapture.Movie) async throws {
         let location = try await currentLocation
         try await performChange {
             let options = PHAssetResourceCreationOptions()
@@ -81,6 +81,8 @@ actor MediaLibrary {
             return creationRequest.placeholderForCreatedAsset
         }
     }
+
+    // MARK: - Private
 
     // A template method for writing a change to the user's photo library.
     private func performChange(_ change: @Sendable @escaping () -> PHObjectPlaceholder?) async throws {
@@ -106,8 +108,6 @@ actor MediaLibrary {
         }
     }
 
-    // MARK: - Thumbnail handling
-
     private func loadInitialThumbnail() async {
         // Only load an initial thumbnail if the user has already authorized the app to write to the Photos library.
         // Deferring this call prevents the app from prompting for Photos authorization when the app starts.
@@ -132,10 +132,6 @@ actor MediaLibrary {
         }
     }
 
-    // MARK: - Location management
-
-    private let locationManager = CLLocationManager()
-
     private var currentLocation: CLLocation? {
         get async throws {
             if locationManager.authorizationStatus == .notDetermined {
@@ -145,9 +141,10 @@ actor MediaLibrary {
             if #available(iOS 17.0, *) {
                 return try await CLLocationUpdate.liveUpdates().first(where: { _ in true })?.location
             } else {
-                // TODO: implement
+                // not implemented
                 return nil
             }
         }
     }
+
 }
