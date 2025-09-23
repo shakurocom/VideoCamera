@@ -244,7 +244,7 @@ private extension CameraModel {
                 return
             }
             // await new capture activity values from the capture service
-            for await activity in await captureServiceActual.$captureActivity.values {
+            for await activity in captureServiceActual.didUpdateCaptureActivity {
                 if activity.willCapture {
                     // flash the screen to indicate capture is starting
                     self?.flashScreen()
@@ -257,8 +257,7 @@ private extension CameraModel {
             guard let captureServiceActual = self?.captureService else {
                 return
             }
-            // await updates to the capabilities that the capture service advertises
-            for await capabilities in await captureServiceActual.$captureCapabilities.values {
+            for await capabilities in captureServiceActual.didUpdateCaptureCapabilities {
                 guard let capabilitiesActual = capabilities else {
                     continue
                 }
@@ -271,7 +270,7 @@ private extension CameraModel {
                 return
             }
             // await updates to a person's interaction with the Camera Control HUD
-            for await isShowingFullscreenControls in await captureServiceActual.$isShowingFullscreenControls.values {
+            for await isShowingFullscreenControls in captureServiceActual.didUpdateIsShowingFullscreenControls {
                 withAnimation {
                     // prefer showing a minimized UI when capture controls enter a fullscreen appearance
                     self?.prefersMinimizedControlsUI = isShowingFullscreenControls

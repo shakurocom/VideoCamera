@@ -8,10 +8,13 @@ enum PhotoCaptureError: Error {
 @CaptureServiceActor
 final class PhotoCapture: OutputService {
 
-    @Published private(set) var captureActivity: CaptureActivity = .idle
+    let didUpdateCaptureActivity: AsyncStream<CaptureActivity>
 
-    let avCaptureOutput = AVCapturePhotoOutput()
+    private(set) var captureActivity: CaptureActivity = .idle
     private(set) var capabilities: CaptureCapabilities?
+    let avCaptureOutput = AVCapturePhotoOutput()
+
+    private let didUpdateCaptureActivityContinuation: AsyncStream<CaptureActivity>.Continuation
 
     private var photoOutput: AVCapturePhotoOutput { avCaptureOutput }
     private var livePhotoCount = 0 // count of Live Photo captures currently in progress
@@ -19,7 +22,15 @@ final class PhotoCapture: OutputService {
     // MARK: - Initialization
 
     @MainActor
-    init() { }
+    init() {
+        let (didUpdateCaptureActivity, didUpdateCaptureActivityContinuation) = AsyncStream.makeStream(of: CaptureActivity.self)
+        self.didUpdateCaptureActivity = didUpdateCaptureActivity
+        self.didUpdateCaptureActivityContinuation = didUpdateCaptureActivityContinuation
+    }
+
+    deinit {
+        didUpdateCaptureActivityContinuation.finish()
+    }
 
     // MARK: - Public
 
@@ -90,6 +101,7 @@ final class PhotoCapture: OutputService {
                     }
                 }
                 captureActivity = currentActivity
+                didUpdateCaptureActivityContinuation.yield(captureActivity)
             }
         }
     }

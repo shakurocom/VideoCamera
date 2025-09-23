@@ -4,9 +4,12 @@ import Combine
 @CaptureServiceActor
 final class MovieCapture: OutputService {
 
-    @Published private(set) var captureActivity: CaptureActivity = .idle
+    let didUpdateCaptureActivity: AsyncStream<CaptureActivity>
 
+    private(set) var captureActivity: CaptureActivity = .idle
     let avCaptureOutput = AVCaptureMovieFileOutput()
+
+    private let didUpdateCaptureActivityContinuation: AsyncStream<CaptureActivity>.Continuation
 
     private var movieOutput: AVCaptureMovieFileOutput { avCaptureOutput }
     private var movieCaptureDelegate: MovieCaptureDelegate?
@@ -21,7 +24,15 @@ final class MovieCapture: OutputService {
     // MARK: - Initialization
 
     @MainActor
-    init() { }
+    init() {
+        let (didUpdateCaptureActivity, didUpdateCaptureActivityContinuation) = AsyncStream.makeStream(of: CaptureActivity.self)
+        self.didUpdateCaptureActivity = didUpdateCaptureActivity
+        self.didUpdateCaptureActivityContinuation = didUpdateCaptureActivityContinuation
+    }
+
+    deinit {
+        didUpdateCaptureActivityContinuation.finish()
+    }
 
     // MARK: - Public
 
@@ -66,6 +77,7 @@ final class MovieCapture: OutputService {
     // starts a timer to update the recording time
     private func startMonitoringDuration() {
         captureActivity = .movieCapture()
+        didUpdateCaptureActivityContinuation.yield(captureActivity)
         timerCancellable = Timer.publish(every: refreshInterval, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
@@ -73,12 +85,14 @@ final class MovieCapture: OutputService {
                 // poll the movie output for its recorded duration
                 let duration = movieOutput.recordedDuration.seconds
                 captureActivity = .movieCapture(duration: duration)
+                didUpdateCaptureActivityContinuation.yield(captureActivity)
             }
     }
 
     private func stopMonitoringDuration() {
         timerCancellable?.cancel()
         captureActivity = .idle
+        didUpdateCaptureActivityContinuation.yield(captureActivity)
     }
 
 }

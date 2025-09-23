@@ -71,20 +71,15 @@ final class CaptureService: NSObject {
 
     nonisolated static let sessionQueue: DispatchQueue = DispatchQueue(label: "com.videoCamera.sessionQueue")
 
-    // TODO: implement - remove @Published
-    /// A value that indicates whether the capture service is idle or capturing a photo or movie.
-    @Published private(set) var captureActivity: CaptureActivity = .idle
-    /// A value that indicates the current capture capabilities of the service.
-    @Published private(set) var captureCapabilities: CaptureCapabilities?
-    /// A Boolean value that indicates whether a higher priority event, like receiving a phone call, interrupts the app.
-    @Published private(set) var isInterrupted = false
-    /// A Boolean value that indicates whether the user enables HDR video capture.
-    @Published var isHDRVideoEnabled = false
-    /// A Boolean value that indicates whether capture controls are in a fullscreen appearance.
-    @Published var isShowingFullscreenControls = false
+    private(set) var captureActivity: CaptureActivity = .idle
+    private(set) var captureCapabilities: CaptureCapabilities?
+    private(set) var isShowingFullscreenControls = false
 
     let previewSource: PreviewSource  // connects a preview destination with the capture session.
 
+    let didUpdateCaptureActivity: AsyncStream<CaptureActivity>
+    let didUpdateCaptureCapabilities: AsyncStream<CaptureCapabilities?>
+    let didUpdateIsShowingFullscreenControls: AsyncStream<Bool>
     let didOutputSampleBuffer: AsyncStream<CMSampleBufferUncheckedSendable>
 
     private let options: Options
@@ -94,15 +89,22 @@ final class CaptureService: NSObject {
     private let deviceLookup = DeviceLookup()
     private let systemPreferredCamera = SystemPreferredCameraObserver() // monitors the state of the system-preferred camera
 
+    private let didUpdateCaptureActivityContinuation: AsyncStream<CaptureActivity>.Continuation
+    private let didUpdateCaptureCapabilitiesContinuation: AsyncStream<CaptureCapabilities?>.Continuation
+    private let didUpdateIsShowingFullscreenControlsContinuation: AsyncStream<Bool>.Continuation
     private let didOutputSampleBufferContinuation: AsyncStream<CMSampleBufferUncheckedSendable>.Continuation
 
     private var activeVideoInput: AVCaptureDeviceInput? // video input for the currently selected device camera
     private(set) var captureMode: CaptureMode?
     private var isSessionConfigured = false
+    private var isHDRVideoEnabled = false
+    // indicates whether a higher priority event, like receiving a phone call, interrupts the app.
+    private var isInterrupted = false
     private var rotationCoordinator: NSObject! // AVCaptureDevice.RotationCoordinator - monitors video device rotations
     private var rotationObservers = [AnyObject]()
     private var controlsMap: [String: [Any]] = [:] // device identifier : capture control (AVCaptureControl)
-    private var controlsDelegate = CaptureControlsDelegate() // object that responds to capture control activation and presentation events
+    // object that responds to capture control activation and presentation events
+    private var controlsDelegate: CaptureControlsDelegate?
     private var subjectAreaChangeTask: Task<Void, Never>?
     private var observeTasks: [Task<Void, Never>] = []
 
@@ -195,12 +197,28 @@ final class CaptureService: NSObject {
         self.previewSource = DefaultPreviewSource(session: session, videoGravity: options.videoGravity)
         self.photoCapture = options.captureModes.contains(.photo) ? PhotoCapture() : nil
         self.movieCapture = options.captureModes.contains(.video) ? MovieCapture() : nil
+
+        let (didUpdateCaptureActivity, didUpdateCaptureActivityContinuation) = AsyncStream.makeStream(of: CaptureActivity.self)
+        self.didUpdateCaptureActivity = didUpdateCaptureActivity
+        self.didUpdateCaptureActivityContinuation = didUpdateCaptureActivityContinuation
+
+        let (didUpdateCaptureCapabilities, didUpdateCaptureCapabilitiesContinuation) = AsyncStream.makeStream(of: CaptureCapabilities?.self)
+        self.didUpdateCaptureCapabilities = didUpdateCaptureCapabilities
+        self.didUpdateCaptureCapabilitiesContinuation = didUpdateCaptureCapabilitiesContinuation
+
+        let (didUpdateIsShowingFullscreenControls, didUpdateIsShowingFullscreenControlsContinuation) = AsyncStream.makeStream(of: Bool.self)
+        self.didUpdateIsShowingFullscreenControls = didUpdateIsShowingFullscreenControls
+        self.didUpdateIsShowingFullscreenControlsContinuation = didUpdateIsShowingFullscreenControlsContinuation
+
         let (didOutputSampleBuffer, didOutputSampleBufferContinuation) = AsyncStream.makeStream(of: CMSampleBufferUncheckedSendable.self)
         self.didOutputSampleBuffer = didOutputSampleBuffer
         self.didOutputSampleBufferContinuation = didOutputSampleBufferContinuation
     }
 
     deinit {
+        didUpdateCaptureActivityContinuation.finish()
+        didUpdateCaptureCapabilitiesContinuation.finish()
+        didUpdateIsShowingFullscreenControlsContinuation.finish()
         didOutputSampleBufferContinuation.finish()
         subjectAreaChangeTask?.cancel()
         observeTasks.forEach({ $0.cancel() })
@@ -383,7 +401,6 @@ final class CaptureService: NSObject {
 
         observeOutputServices()
         observeNotifications()
-        observeCaptureControlsState()
 
         do {
             guard let defaultCamera = deviceLookup.getCamera(position: options.cameraPosition) else {
@@ -490,7 +507,9 @@ final class CaptureService: NSObject {
                 CaptureService.logger.info("Unable to add control \(control).")
             }
         }
-        captureSession.setControlsDelegate(controlsDelegate, queue: CaptureService.sessionQueue)
+        let delegate = CaptureControlsDelegate(didUpdateIsShowingFullscreenControlsContinuation: didUpdateIsShowingFullscreenControlsContinuation)
+        controlsDelegate = delegate
+        captureSession.setControlsDelegate(delegate, queue: CaptureService.sessionQueue)
         captureSession.commitConfiguration()
     }
 
@@ -652,29 +671,32 @@ final class CaptureService: NSObject {
         switch captureMode {
         case .photo:
             captureCapabilities = photoCapture?.capabilities
+            didUpdateCaptureCapabilitiesContinuation.yield(captureCapabilities)
         case .video:
             captureCapabilities = movieCapture?.capabilities
+            didUpdateCaptureCapabilitiesContinuation.yield(captureCapabilities)
         case .none:
             break
         }
     }
 
-    /// Merge the `captureActivity` values of the photo and movie capture services,
-    /// and assign the value to the actor's property.`
     private func observeOutputServices() {
-        if let photoCaptureActual = photoCapture, let movieCaptureActual = movieCapture {
-            Publishers.Merge(photoCaptureActual.$captureActivity, movieCaptureActual.$captureActivity).assign(to: &$captureActivity)
-        } else if let photoCaptureActual = photoCapture {
-            photoCaptureActual.$captureActivity.assign(to: &$captureActivity)
-        } else if let movieCaptureActual = movieCapture {
-            movieCaptureActual.$captureActivity.assign(to: &$captureActivity)
+        if let photoCaptureActual = photoCapture {
+            observeTasks.append(Task(operation: { [weak self] in
+                for await captureActivity in photoCaptureActual.didUpdateCaptureActivity where self?.captureActivity != captureActivity {
+                    self?.captureActivity = captureActivity
+                    self?.didUpdateCaptureActivityContinuation.yield(captureActivity)
+                }
+            }))
         }
-    }
-
-    /// observe when capture control enter and exit a fullscreen appearance
-    private func observeCaptureControlsState() {
-        controlsDelegate.$isShowingFullscreenControls
-            .assign(to: &$isShowingFullscreenControls)
+        if let movieCaptureActual = movieCapture {
+            observeTasks.append(Task(operation: { [weak self] in
+                for await captureActivity in movieCaptureActual.didUpdateCaptureActivity where self?.captureActivity != captureActivity {
+                    self?.captureActivity = captureActivity
+                    self?.didUpdateCaptureActivityContinuation.yield(captureActivity)
+                }
+            }))
+        }
     }
 
     private func observeNotifications() {
@@ -724,20 +746,31 @@ extension CaptureService: AVCaptureVideoDataOutputSampleBufferDelegate {
 
 private class CaptureControlsDelegate: NSObject, AVCaptureSessionControlsDelegate {
 
-    @Published private(set) var isShowingFullscreenControls = false
+    private var isShowingFullscreenControls = false
+    private let didUpdateIsShowingFullscreenControlsContinuation: AsyncStream<Bool>.Continuation
+
+    init(didUpdateIsShowingFullscreenControlsContinuation: AsyncStream<Bool>.Continuation) {
+        self.didUpdateIsShowingFullscreenControlsContinuation = didUpdateIsShowingFullscreenControlsContinuation
+    }
 
     func sessionControlsDidBecomeActive(_ session: AVCaptureSession) {
         CaptureService.logger.debug("Capture controls active.")
     }
 
     func sessionControlsWillEnterFullscreenAppearance(_ session: AVCaptureSession) {
-        isShowingFullscreenControls = true
-        CaptureService.logger.debug("Capture controls will enter fullscreen appearance.")
+        if !isShowingFullscreenControls {
+            isShowingFullscreenControls = true
+            didUpdateIsShowingFullscreenControlsContinuation.yield(isShowingFullscreenControls)
+            CaptureService.logger.debug("Capture controls will enter fullscreen appearance.")
+        }
     }
 
     func sessionControlsWillExitFullscreenAppearance(_ session: AVCaptureSession) {
-        isShowingFullscreenControls = false
-        CaptureService.logger.debug("Capture controls will exit fullscreen appearance.")
+        if isShowingFullscreenControls {
+            isShowingFullscreenControls = false
+            didUpdateIsShowingFullscreenControlsContinuation.yield(isShowingFullscreenControls)
+            CaptureService.logger.debug("Capture controls will exit fullscreen appearance.")
+        }
     }
 
     func sessionControlsDidBecomeInactive(_ session: AVCaptureSession) {
