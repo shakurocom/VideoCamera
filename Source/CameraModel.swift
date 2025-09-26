@@ -234,9 +234,7 @@ private extension CameraModel {
             }
             // await new thumbnails that the media library generates when saving a file
             for await thumbnail in mediaLibraryActual.thumbnails {
-                if let thumbnail {
-                    self?.thumbnail = thumbnail
-                }
+                self?.thumbnail = thumbnail
             }
         }))
         observeTasks.append(Task(operation: { [weak self] in
@@ -247,7 +245,7 @@ private extension CameraModel {
             for await activity in captureServiceActual.didUpdateCaptureActivity {
                 if activity.willCapture {
                     // flash the screen to indicate capture is starting
-                    self?.flashScreen()
+                    self?.flashScreen() // TODO: implement - move to UI
                 } else {
                     self?.captureActivity = activity
                 }
@@ -271,7 +269,7 @@ private extension CameraModel {
             }
             // await updates to a person's interaction with the Camera Control HUD
             for await isShowingFullscreenControls in captureServiceActual.didUpdateIsShowingFullscreenControls {
-                withAnimation {
+                withAnimation { // TODO: implement - move to UI
                     // prefer showing a minimized UI when capture controls enter a fullscreen appearance
                     self?.prefersMinimizedControlsUI = isShowingFullscreenControls
                 }
@@ -281,7 +279,7 @@ private extension CameraModel {
 
     private func flashScreen() {
         shouldFlashScreen = true
-        withAnimation(.linear(duration: 0.01), {
+        withAnimation(.linear(duration: 0.01), { // TODO: implement - move to UI
             shouldFlashScreen = false
         })
     }

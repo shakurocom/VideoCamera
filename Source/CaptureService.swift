@@ -372,7 +372,7 @@ final class CaptureService: NSObject {
     }
 
     func startRecording() {
-        movieCapture?.startRecording()
+        try? movieCapture?.startRecording()
     }
 
     func stopRecording() async throws -> MovieCapture.Movie {
@@ -398,11 +398,10 @@ final class CaptureService: NSObject {
                 captureSession.sessionPreset = .high
                 isHDRVideoEnabled = false
             }
-            captureSession.commitConfiguration()
         } catch {
             CaptureService.logger.error("Unable to obtain lock on device and can't enable HDR video capture.")
-            captureSession.commitConfiguration()
         }
+        captureSession.commitConfiguration()
     }
 
     // MARK: - Private
@@ -594,7 +593,6 @@ final class CaptureService: NSObject {
             return
         }
         captureSession.beginConfiguration()
-        defer { captureSession.commitConfiguration() }
         // remove the existing video input before attempting to connect a new one
         captureSession.removeInput(currentInput)
         do {
@@ -612,6 +610,7 @@ final class CaptureService: NSObject {
         } catch {
             captureSession.addInput(currentInput)
         }
+        captureSession.commitConfiguration()
     }
 
     /// iPadOS supports external cameras. When someone connects an external camera to their iPad,

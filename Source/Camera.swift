@@ -113,4 +113,5 @@ public enum CameraError: Error {
     case deviceChangeFailed
     case photoCaptureNotAllowed
     case movieCaptureNotAllowed
+    case movieCaptureConnectionFailed
 }

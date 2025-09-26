@@ -19,7 +19,7 @@ struct CameraView<CameraModel: Camera>: PlatformView {
             // A container view that manages the placement of the preview.
             PreviewContainer(camera: camera) {
                 // A view that provides a preview of the captured content.
-                CameraPreview(source: camera.previewSource)
+                CameraPreviewView(source: camera.previewSource)
                     // Handle capture events from device hardware buttons.
                     .onCameraCaptureEvent(defaultSoundDisabled: true) { event in
                         if event.phase == .ended {

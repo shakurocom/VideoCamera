@@ -10,8 +10,8 @@ actor MediaLibrary {
     }
 
     /// An asynchronous stream of thumbnail images the app generates after capturing media.
-    let thumbnails: AsyncStream<CGImage?>
-    private let continuation: AsyncStream<CGImage?>.Continuation?
+    let thumbnails: AsyncStream<CGImage>
+    private let continuation: AsyncStream<CGImage>.Continuation?
 
     private let locationManager = CLLocationManager()
 
@@ -35,7 +35,7 @@ actor MediaLibrary {
 
     /// Creates a new media library object.
     init() {
-        let (thumbnails, continuation) = AsyncStream.makeStream(of: CGImage?.self)
+        let (thumbnails, continuation) = AsyncStream.makeStream(of: CGImage.self)
         self.thumbnails = thumbnails
         self.continuation = continuation
     }
@@ -127,8 +127,8 @@ actor MediaLibrary {
                                               contentMode: .default,
                                               options: nil) { [weak self] image, _ in
             // Set the latest thumbnail image.
-            guard let self, let image = image else { return }
-            continuation?.yield(image.cgImage)
+            guard let self, let cgImage = image?.cgImage else { return }
+            continuation?.yield(cgImage)
         }
     }
 

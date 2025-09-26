@@ -40,12 +40,12 @@ final class MovieCapture: OutputService {
 
     // MARK: - Public
 
-    func startRecording() {
+    func startRecording() throws {
         guard !movieOutput.isRecording else {
             return
         }
         guard let connection = movieOutput.connection(with: .video) else {
-            fatalError("Configuration error. No video connection found.")
+            throw CameraError.movieCaptureConnectionFailed
         }
         // configure connection for HEVC capture
         if movieOutput.availableVideoCodecTypes.contains(.hevc) {

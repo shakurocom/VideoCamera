@@ -37,8 +37,6 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A5E5931A2E72D439000C3DE5 /* VideoCamera_ExampleSwiftUI */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = VideoCamera_ExampleSwiftUI;
 			sourceTree = "<group>";
 		};
@@ -194,9 +192,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-VideoCamera_ExampleSwiftUI/Pods-VideoCamera_ExampleSwiftUI-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-VideoCamera_ExampleSwiftUI/Pods-VideoCamera_ExampleSwiftUI-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

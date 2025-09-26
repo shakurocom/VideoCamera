@@ -1,7 +1,7 @@
 import SwiftUI
 @preconcurrency import AVFoundation
 
-public struct CameraPreview: UIViewRepresentable {
+public struct CameraPreviewView: UIViewRepresentable {
 
     private let source: PreviewSource
 
