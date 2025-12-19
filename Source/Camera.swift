@@ -1,3 +1,4 @@
+@preconcurrency import AVFoundation
 import SwiftUI
 
 @MainActor
@@ -16,7 +17,9 @@ public protocol Camera: AnyObject, SendableMetatype, ObservableObject {
     var shouldFlashScreen: Bool { get } // indicates whether to show visual feedback when capture begins
     var previewSource: PreviewSource { get }
     var thumbnail: CGImage? { get } // thumbnail image for the most recent photo or video capture.
+    var hasTorch: Bool { get async }
     var error: Error? { get } // error if the camera encountered a problem
+    var didOutputSampleBuffer: AsyncStream<CMSampleBufferUncheckedSendable> { get }
 
     func start() async throws
     func stopSession() async
@@ -25,6 +28,12 @@ public protocol Camera: AnyObject, SendableMetatype, ObservableObject {
     func focusAndExpose(at point: CGPoint) async // func performs a one-time automatic focus and exposure operation
     func capturePhoto() async // captures a photo and writes it to the user's photo library
     func toggleRecording() async // starts or stops recording a movie, and writes it to the user's photo library when complete
+    func setVideoPreviewPaused(_ paused: Bool) async
+    func setFocusMode(_ mode: AVCaptureDevice.FocusMode, focusPointOfInterest: CGPoint) async throws
+    func torchMode() async -> AVCaptureDevice.TorchMode
+    func setSmoothAutoFocusEnabled(_ enabled: Bool) async throws
+    func setTorchMode(_ mode: AVCaptureDevice.TorchMode) async throws
+    func videoDataOutputSize() async -> CGSize
 
 }
 

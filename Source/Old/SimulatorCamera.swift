@@ -62,7 +62,7 @@ internal class SimulatorCamera {
 
         // simulate creation of capture device
         VideoCameraFactory.requestAuthorizationForVideo(completion: { (_: Bool) in
-            DispatchQueue.main.async(execute: { // TODO: implement - called on background
+            DispatchQueue.main.async(execute: {
                 self.delegate?.videoCamera(self, authorizationStatusChanged: VideoCameraFactory.authorizationStatusForVideo())
             })
         })

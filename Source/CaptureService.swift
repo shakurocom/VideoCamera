@@ -312,7 +312,7 @@ final class CaptureService: NSObject {
     }
 
     func setVideoPreviewPaused(_ paused: Bool) {
-        let connection = videoPreviewLayer.connection
+        let connection = videoPreviewLayer?.connection
         Task(operation: { @MainActor in
             connection?.isEnabled = !paused
         })
@@ -321,7 +321,9 @@ final class CaptureService: NSObject {
     /// performs a one-time automatic focus and expose operation when person tapping on the preview area.
     func focusAndExpose(at point: CGPoint) {
         // point is in view-space coordinates - converting this point to device coordinates.
-        let devicePoint = videoPreviewLayer.captureDevicePointConverted(fromLayerPoint: point)
+        guard let devicePoint = videoPreviewLayer?.captureDevicePointConverted(fromLayerPoint: point) else {
+            return
+        }
         do {
             try focusAndExpose(at: devicePoint, isUserInitiated: true)
         } catch {
@@ -417,6 +419,13 @@ final class CaptureService: NSObject {
         do {
             guard let defaultCamera = deviceLookup.getCamera(position: options.cameraPosition) else {
                 throw CameraError.videoDeviceUnavailable
+            }
+
+            // problem is monitorSystemPreferredCamera() switches camera
+            // Set user preferred camera to match our requested camera position
+            // This prevents the system from automatically switching to a different camera
+            if #available(iOS 17.0, *) {
+                AVCaptureDevice.userPreferredCamera = defaultCamera
             }
 
             if let preset = options.captureSessionPreset {
@@ -654,7 +663,7 @@ final class CaptureService: NSObject {
 
     @available(iOS 17.0, *)
     private func updatePreviewRotation(_ angle: CGFloat) {
-        let connection = videoPreviewLayer.connection
+        let connection = videoPreviewLayer?.connection
         Task(operation: { @MainActor in
             connection?.videoRotationAngle = angle
         })
@@ -665,9 +674,10 @@ final class CaptureService: NSObject {
         outputServices.forEach { $0.setVideoRotationAngle(angle) }
     }
 
-    private var videoPreviewLayer: AVCaptureVideoPreviewLayer {
+    private var videoPreviewLayer: AVCaptureVideoPreviewLayer? {
         guard let previewLayer = captureSession.connections.compactMap({ $0.videoPreviewLayer }).first else {
-            fatalError("The app is misconfigured. The capture session should have a connection to a preview layer.")
+            debugPrint("The app is misconfigured. The capture session should have a connection to a preview layer.")
+            return nil
         }
         return previewLayer
     }

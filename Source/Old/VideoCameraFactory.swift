@@ -19,8 +19,7 @@ public class VideoCameraFactory {
     @MainActor
     public static func createCamera(configuration: VideoCameraConfiguration) -> VideoCamera {
         let camera: VideoCamera
-        let currentDevice = DeviceType.current
-        if currentDevice == .simulatorI386 || currentDevice == .simulatorX8664 || currentDevice == .simulatorARM64 {
+        if DeviceType.current().isSimulator() {
             do {
                 camera = try SimulatorCamera(configuration: configuration)
             } catch let error as VideoCameraError {
@@ -42,13 +41,13 @@ public class VideoCameraFactory {
         return AVCaptureDevice.authorizationStatus(for: AVMediaType.audio)
     }
 
-    public static func requestAuthorizationForVideo(completion: @escaping (_ authGranted: Bool) -> Void) {
+    public static func requestAuthorizationForVideo(completion: @escaping @Sendable (_ authGranted: Bool) -> Void) {
         AVCaptureDevice.requestAccess(for: AVMediaType.video, completionHandler: { (authGranted) in
-            completion(authGranted)
+            completion(authGranted) // TODO: <<- check isolated fail
         })
     }
 
-    public static func requestAuthorizationForAudio(completion: @escaping (_ authGranted: Bool) -> Void) {
+    public static func requestAuthorizationForAudio(completion: @escaping @Sendable (_ authGranted: Bool) -> Void) {
         AVCaptureDevice.requestAccess(for: AVMediaType.audio, completionHandler: { (authGranted) in
             completion(authGranted)
         })
