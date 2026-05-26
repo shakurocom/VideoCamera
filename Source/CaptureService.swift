@@ -17,10 +17,15 @@ import os.log
 
 private final class DispatchQueueExecutor: SerialExecutor {
 
+    private static let queueIDKey = DispatchSpecificKey<ObjectIdentifier>()
+
     private let queue: DispatchQueue
+    private let queueID: ObjectIdentifier
 
     init(_ queue: DispatchQueue) {
         self.queue = queue
+        self.queueID = ObjectIdentifier(queue)
+        queue.setSpecific(key: Self.queueIDKey, value: queueID)
     }
 
     public func enqueue(_ job: UnownedJob) {
@@ -35,6 +40,10 @@ private final class DispatchQueueExecutor: SerialExecutor {
 
     public func checkIsolated() {
         dispatchPrecondition(condition: .onQueue(self.queue))
+    }
+
+    public func isIsolatingCurrentContext() -> Bool {
+        return DispatchQueue.getSpecific(key: Self.queueIDKey) == queueID
     }
 
 }
@@ -249,11 +258,17 @@ final class CaptureService: NSObject {
         captureSession.startRunning()
     }
 
-    func stopSession() {
+    func stopSession() async {
         guard captureSession.isRunning else {
             return
         }
-        captureSession.stopRunning()
+        let session = captureSession
+        await MainActor.run {
+            for connection in session.connections where connection.videoPreviewLayer != nil {
+                connection.videoPreviewLayer?.session = nil
+            }
+        }
+        session.stopRunning()
     }
 
     func setCaptureMode(_ captureMode: CaptureMode) throws {

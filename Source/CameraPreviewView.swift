@@ -58,6 +58,12 @@ public class PreviewView: UIView, PreviewTarget {
         })
     }
 
+    public nonisolated func clearSession() {
+        Task(operation: { @MainActor in
+            previewLayer.session = nil
+        })
+    }
+
     public nonisolated func setVideoGravity(_ videoGravity: AVLayerVideoGravity) {
         Task(operation: { @MainActor in
             previewLayer.videoGravity = videoGravity
@@ -75,13 +81,38 @@ public class PreviewView: UIView, PreviewTarget {
 public protocol PreviewSource: Sendable {
     // Connects a preview destination to this source.
     func connect(to target: PreviewTarget)
+    // Disconnects a preview destination from this source.
+    //
+    // Call this before the preview target is removed from the view hierarchy
+    // (and therefore deallocated) while the capture session is still running.
+    // It detaches the capture session from the preview layer so that the
+    // layer's `dealloc` does not race with concurrent session mutations
+    // (e.g. `stopRunning` on the session queue), which can otherwise throw
+    // an `NSException` from AVFoundation.
+    func disconnect(from target: PreviewTarget)
+}
+
+public extension PreviewSource {
+
+    func disconnect(from target: PreviewTarget) {
+        target.clearSession()
+    }
+
 }
 
 /// A protocol that passes the app's capture session to the `CameraPreview` view.
 public protocol PreviewTarget {
     // Sets the capture session on the destination.
     func setSession(_ session: AVCaptureSession)
+    // Clears the capture session from the destination.
+    func clearSession()
     func setVideoGravity(_ videoGravity: AVLayerVideoGravity)
+}
+
+public extension PreviewTarget {
+
+    func clearSession() { }
+
 }
 
 /// The app's default `PreviewSource` implementation.
@@ -99,4 +130,9 @@ struct DefaultPreviewSource: PreviewSource {
         target.setSession(session)
         target.setVideoGravity(videoGravity)
     }
+
+    func disconnect(from target: PreviewTarget) {
+        target.clearSession()
+    }
+
 }
